@@ -1,0 +1,33 @@
+# ===== Laravel: dependencies =====
+/vendor/
+
+# ===== Laravel: env & secrets =====
+/.env
+/.env.backup
+.phpunit.result.cache
+
+# ===== Laravel: storage (keep dirs, ignore content) =====
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# ===== Laravel: bootstrap cache =====
+/bootstrap/cache/*.php
+/bootstrap/cache/*.json
+
+# ===== Laravel: tests cache =====
+.phpunit.cache/
+
+# ===== Editor / OS =====
+.idea/
+.vscode/
+.DS_Store

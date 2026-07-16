@@ -1,0 +1,2 @@
+<?php
+// roles migration skeleton

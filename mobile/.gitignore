@@ -1,0 +1,23 @@
+# ===== Flutter / Dart =====
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+build/
+.dart_tool/**/*.json
+
+# ===== Secrets / API keys (JANGAN di-upload) =====
+/android/local.properties
+/android/key.properties
+/android/app/keystore.jks
+/android/app/upload-keystore.jks
+/ios/Runner/GoogleService-Info.plist
+/ios/Runner/Secrets.swift
+/ios/Runner/GeneratedPluginRegistrant.*.bak
+# Google Maps API key masuk sini, bukan ke VCS
+
+# ===== Editor / OS =====
+.idea/
+.vscode/
+.DS_Store
+*.iml

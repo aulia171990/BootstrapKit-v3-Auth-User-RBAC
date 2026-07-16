@@ -1,0 +1,47 @@
+{
+    "name": "ojol-online/backend",
+    "type": "project",
+    "description": "Ojol Online backend (Laravel 11) — Auth/RBAC + Driver + Order modules",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^11.0",
+        "laravel/reverb": "^1.10",
+        "predis/predis": "^3.5",
+        "tymon/jwt-auth": "^2.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Seeders\\": "database/seeders/",
+            "Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+        "post-update-cmd": "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+        "post-root-package-install": "Illuminate\\Foundation\\ComposerScripts::postRootPackageInstall",
+        "post-create-project-cmd": "php artisan key:generate"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {},
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
