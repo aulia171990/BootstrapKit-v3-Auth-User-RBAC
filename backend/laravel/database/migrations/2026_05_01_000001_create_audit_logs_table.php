@@ -16,13 +16,15 @@ return new class extends Migration
     {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('action');          // login | logout | register | password_change | failed_login | email_verification | token_refresh
+            $table->uuid('user_id')->nullable();
+            $table->string('action');
             $table->string('ip_address', 45)->nullable()->index();
-            $table->string('actor_email')->nullable(); // denormalised for quick search when user_id is null
-            $table->jsonb('context')->nullable();       // device/platform/ua, outcome, extra
+            $table->string('actor_email')->nullable();
+            $table->jsonb('context')->nullable();
             $table->timestamp('created_at')->nullable()->index();
             $table->timestamp('updated_at')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
     }
 

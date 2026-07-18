@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('payment_splits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('transaction_id')->constrained('payment_transactions')->cascadeOnDelete();
             $table->string('recipient_type');
             $table->string('recipient_id');
             $table->string('label')->nullable();

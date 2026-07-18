@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('payment_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('booking_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('trip_id')->nullable()->constrained()->nullOnDelete();
+            $table->uuid('user_id')->nullable();
+            $table->foreignUuid('booking_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUuid('trip_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('payment_method_id')->nullable()->constrained()->nullOnDelete();
             $table->string('type');
             $table->string('status')->default('pending');
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('failure_reason')->nullable();
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->unique(['booking_id', 'type']);
         });
     }

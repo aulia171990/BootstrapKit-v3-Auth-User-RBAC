@@ -5,20 +5,18 @@ namespace App\Models\Api;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class ApiClient extends Model
 {
-    use HasUuids, SoftDeletes;
-
-    protected $fillable = ['user_id', 'name', 'type', 'scopes', 'last_used_at', 'is_active'];
+    protected $fillable = ['user_id', 'name', 'type', 'status', 'allowed_scopes', 'allowed_ips', 'rate_limit', 'last_used_at'];
 
     protected $casts = [
-        'last_used_at' => 'datetime',
+        'allowed_scopes' => 'array',
+        'allowed_ips' => 'array',
+        'is_active' => 'boolean',
     ];
 
-    public function user(): BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

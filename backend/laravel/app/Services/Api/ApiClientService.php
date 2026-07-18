@@ -11,10 +11,10 @@ class ApiClientService
 {
     public function __construct(private ApiClientRepository $clients) {}
 
-    public function create(array $data, int $ownerId): ApiClient
+    public function create(array $data, string $ownerId): ApiClient
     {
         $client = $this->clients->create([
-            'user_id' => $ownerId,
+            'user_id' => (string) $ownerId,
             'name' => $data['name'],
             'type' => $data['type'] ?? 'partner',
             'scopes' => $data['scopes'] ?? null,

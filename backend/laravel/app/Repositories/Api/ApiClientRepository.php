@@ -18,6 +18,6 @@ class ApiClientRepository
 
     public function findActive(string $id): ?ApiClient
     {
-        return ApiClient::where('id', $id)->where('is_active', true)->first();
+        return ApiClient::where('id', $id)->where('status', 'active')->first();
     }
 }

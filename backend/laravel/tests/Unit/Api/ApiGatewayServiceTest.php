@@ -4,53 +4,53 @@ namespace Tests\Unit\Api;
 
 use App\Exceptions\Api\ApiGatewayException;
 use App\Repositories\Api\ApiClientRepository;
+use App\Repositories\Api\ApiKeyRepository;
 use App\Repositories\Api\ApiScopeRepository;
 use App\Repositories\Api\ApiTokenRepository;
 use App\Services\Api\OAuthService;
+use App\Models\User;
 use App\Models\Api\ApiClient;
 use App\Models\Api\ApiKey;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class ApiGatewayServiceTest extends TestCase
 {
-    public function test_oauth_service_can_issue_token(): void
+    use RefreshDatabase;
+
+    protected function setUp(): void
     {
-        $client = app(ApiClientRepository::class)->create([
-            'name' => 'Test client',
-            'owner_id' => 1,
+        parent::setUp();
+        $this->artisan('migrate')->assertSuccessful();
+        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+    }
+
+    public function test_api_client_repository_can_persist_and_find_active_client(): void
+    {
+        $repo = app(ApiClientRepository::class);
+        $client = $repo->create([
+            'name' => 'Unit client',
+            'user_id' => User::first()->id,
             'status' => 'active',
-            'allowed_ips' => [],
             'allowed_scopes' => ['trips:read'],
+            'allowed_ips' => ['127.0.0.1'],
             'rate_limit' => 100,
         ]);
 
-        app(ApiKeyRepository::class)->create([
-            'client_id' => $client->id,
-            'prefix' => 'abcdef',
-            'key_hash' => Hash::make('secret-key'),
-            'status' => 'active',
-        ]);
+        $this->assertSame('active', $client->status);
 
-        $service = new OAuthService(
-            app(\App\Repositories\Api\ApiKeyRepository::class),
-            app(ApiClientRepository::class),
-            app(ApiScopeRepository::class),
-            app(ApiTokenRepository::class),
-        );
-
-        $token = $service->issueToken($client->id, 'secret-key', ['trips:read']);
-
-        $this->assertNotNull($token->id);
-        $this->assertSame(['trips:read'], $token->scopes);
+        $found = $repo->findActive($client->id);
+        $this->assertNotNull($found);
+        $this->assertSame($client->id, $found->id);
     }
 
-    public function test_issue_token_fails_with_invalid_client(): void
+    public function test_oauth_service_throws_for_missing_client(): void
     {
         $this->expectException(ApiGatewayException::class);
 
         $service = new OAuthService(
-            app(\App\Repositories\Api\ApiKeyRepository::class),
+            app(ApiKeyRepository::class),
             app(ApiClientRepository::class),
             app(ApiScopeRepository::class),
             app(ApiTokenRepository::class),

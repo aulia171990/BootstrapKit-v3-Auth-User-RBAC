@@ -9,24 +9,27 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('api_clients', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->id();
+            $table->uuid('user_id');
             $table->string('name');
             $table->string('type')->default('partner');
-            $table->string('scopes')->nullable();
+            $table->string('status')->default('active');
+            $table->json('allowed_scopes')->nullable();
+            $table->json('allowed_ips')->nullable();
+            $table->unsignedInteger('rate_limit')->nullable();
             $table->timestamp('last_used_at')->nullable();
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
 
         Schema::create('api_keys', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('api_client_id')->constrained('api_clients')->cascadeOnDelete();
             $table->string('prefix', 20)->index();
             $table->text('hashed_secret');
             $table->json('scopes')->nullable();
-            $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -43,10 +46,10 @@ return new class extends Migration
         });
 
         Schema::create('api_tokens', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('api_key_id')->constrained('api_keys')->cascadeOnDelete();
             $table->string('tokenable_type')->nullable();
-            $table->uuid('tokenable_id')->nullable();
+            $table->unsignedBigInteger('tokenable_id')->nullable();
             $table->json('abilities')->nullable();
             $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
@@ -55,7 +58,7 @@ return new class extends Migration
         });
 
         Schema::create('api_webhooks', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('api_client_id')->constrained('api_clients')->cascadeOnDelete();
             $table->string('url');
             $table->string('events')->default('[]');
@@ -68,7 +71,7 @@ return new class extends Migration
         });
 
         Schema::create('api_webhook_deliveries', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('api_webhook_id')->constrained('api_webhooks')->cascadeOnDelete();
             $table->string('event');
             $table->string('status');
@@ -81,7 +84,7 @@ return new class extends Migration
         });
 
         Schema::create('api_rate_limits', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('api_client_id')->nullable()->constrained('api_clients')->nullOnDelete();
             $table->string('subject_type');
             $table->string('subject_id');

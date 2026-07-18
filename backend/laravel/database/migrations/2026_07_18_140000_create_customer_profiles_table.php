@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('customer_profiles', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+            $table->uuid('user_id');
             $table->string('display_name')->nullable();
             $table->string('gender')->nullable(); // male|female|other
             $table->date('date_of_birth')->nullable();
@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('status')->default('active'); // active|blocked|suspended
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->unique('user_id');
         });
     }
 

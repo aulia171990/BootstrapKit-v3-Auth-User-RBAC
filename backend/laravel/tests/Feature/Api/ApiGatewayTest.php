@@ -3,7 +3,8 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Api\ApiClient;
-use App\Models\Api\ApiKey;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -21,27 +22,34 @@ class ApiGatewayTest extends TestCase
         app('cache')->flush();
     }
 
-    private function bearer(string $token): static
+    private function actingAsGatewayUser(): User
     {
-        return $this->withHeader('Authorization', 'Bearer ' . $token);
+        $user = User::factory()->create();
+        $role = Role::where('name', 'admin')->firstOrCreate(['name' => 'admin']);
+        $permission = Permission::where('code', 'api.manage')->first();
+        if (! $permission) {
+            $permission = Permission::create(['code' => 'api.manage', 'name' => 'Manage API Gateway', 'group' => 'api']);
+            $role->permissions()->attach($permission->id);
+        }
+        $user->roles()->attach($role->id);
+
+        return $user;
     }
 
-    private function login(string $email = 'admin@ojol.test', string $password = 'password'): string
+    private function token(User $user): string
     {
-        return $this->postJson('/api/v1/auth/login', [
-            'email' => $email,
-            'password' => $password,
-        ])->json('data.token');
+        return JWTAuth::fromUser($user);
     }
 
     public function test_register_api_client_returns_success_envelope(): void
     {
-        $token = $this->login();
+        $user = $this->actingAsGatewayUser();
+        $token = $this->token($user);
 
-        $response = $this->bearer($token)->postJson('/api/v1/api/clients', [
-            'name' => 'Partner Alpha',
-            'rate_limit' => 1000,
-        ]);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/gateway/clients', [
+                'name' => 'Partner Alpha',
+            ]);
 
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
@@ -50,21 +58,23 @@ class ApiGatewayTest extends TestCase
 
     public function test_issue_token_rejects_invalid_key(): void
     {
-        $token = $this->login();
+        $user = $this->actingAsGatewayUser();
+        $token = $this->token($user);
 
         $client = ApiClient::create([
             'name' => 'Partner X',
-            'owner_id' => User::first()->id,
-            'status' => 'active',
+            'user_id' => $user->id,
+            'is_active' => true,
             'allowed_scopes' => ['orders.read'],
             'allowed_ips' => [],
             'rate_limit' => 1000,
         ]);
 
-        $response = $this->bearer($token)->postJson('/api/v1/api/tokens', [
-            'client_id' => $client->id,
-            'key' => 'invalid-key',
-        ]);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/gateway/oauth/token', [
+                'client_id' => (string) $client->id,
+                'key' => 'invalid-key',
+            ]);
 
         $response->assertStatus(401)
             ->assertJsonPath('success', false);

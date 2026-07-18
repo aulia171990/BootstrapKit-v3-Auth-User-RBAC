@@ -21,10 +21,12 @@ return new class extends Migration
             $table->string('email')->nullable()->index();
             $table->string('ip_address', 45)->index();
             $table->boolean('success')->default(false);
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->uuid('user_id')->nullable();
             $table->string('type')->default('password'); // password | otp_request | otp_login | reset
             $table->timestamp('created_at')->nullable()->index();
             $table->timestamp('updated_at')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
     }
 

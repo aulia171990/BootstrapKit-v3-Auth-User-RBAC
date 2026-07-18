@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('booking_code')->unique();
-            $table->foreignUuid('customer_id')->constrained()->cascadeOnDelete();
-            $table->foreignUuid('driver_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUuid('customer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('driver_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('vehicle_type')->nullable();
             $table->string('service_type');
             $table->decimal('pickup_latitude', 10, 7);

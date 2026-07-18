@@ -34,7 +34,7 @@ class ApiGatewayController extends Controller
             'owner_id' => ['nullable', 'integer'],
         ]);
 
-        $ownerId = $validated['owner_id'] ?? (int) $request->user()->id;
+        $ownerId = $validated['owner_id'] ?? $request->user()->id;
 
         $client = $this->clients->create($validated, $ownerId);
 
@@ -80,11 +80,15 @@ class ApiGatewayController extends Controller
             'scopes' => ['nullable', 'array'],
         ]);
 
-        $token = $this->oauth->issueToken(
-            $validated['client_id'],
-            $validated['key'],
-            $validated['scopes'] ?? []
-        );
+        try {
+            $token = $this->oauth->issueToken(
+                $validated['client_id'],
+                $validated['key'],
+                $validated['scopes'] ?? []
+            );
+        } catch (\App\Exceptions\Api\ApiGatewayException $e) {
+            return ApiResponse::error($e->getMessage(), 401);
+        }
 
         return ApiResponse::success($token, 'Token issued', 201);
     }
