@@ -14,6 +14,7 @@ class RoleSeeder extends Seeder
             ['name' => 'customer', 'description' => 'Pengguna yang memesan layanan'],
             ['name' => 'driver',   'description' => 'Pengemudi yang menerima order'],
             ['name' => 'admin',    'description' => 'Pengelola sistem'],
+            ['name' => 'superadmin', 'description' => 'Pengelola tertinggi'],
         ];
 
         foreach ($roles as $role) {
@@ -25,6 +26,8 @@ class RoleSeeder extends Seeder
             ['email' => 'admin@ojol.test'],
             ['name' => 'Admin Demo', 'phone' => '6281000000001', 'password' => bcrypt('password'), 'status' => 1]
         );
+        $admin->email_verified = true;
+        $admin->save();
         $admin->roles()->syncWithoutDetaching(Role::where('name', 'admin')->first()->id);
     }
 }

@@ -1,0 +1,532 @@
+openapi: 3.1.0
+info:
+  title: Ojol Online — Auth API
+  description: >
+    Standard API untuk autentikasi & manajemen akun Ojol Online.
+
+    Setiap respons dibungkus dalam *envelope* standar:
+    ```
+    {
+      "success": boolean,
+      "message": string,
+      "data":    object|array|null,
+      "meta":    object,
+      "errors":  array
+    }
+    ```
+    - `meta` berisi info paginasi bila `data` berupa list terpaginasi, atau `{}`.
+    - `errors` berisi detail field (validasi) atau `[]`.
+    - Error internal (SQL, stack trace) **tidak pernah** dikirim ke client.
+  version: 1.0.0
+  contact:
+    name: Ojol Online Backend
+servers:
+  - url: /api/v1
+    description: API v1 (prefix /api/v1)
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      operationId: register
+      summary: Daftar akun baru (customer)
+      description: >
+        Membuat user baru dengan peran default `customer`. Field `role`/`roles`/
+        `is_admin` diabaikan (hardening privilege-escalation). Password wajib
+        mixed-case + angka + simbol, min 8 karakter.
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              name: Budi Santoso
+              email: budi@ojol.test
+              phone: '6281200000011'
+              password: 'Newsecret1!'
+              password_confirmation: 'Newsecret1!'
+      responses:
+        '201':
+          description: Registrasi berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/login:
+    post:
+      operationId: login
+      summary: Login (email atau nomor telepon)
+      description: >
+        Autentikasi dengan identifier (email/phone) + password. Rate-limit 5/menit.
+        Gagal berturut-turut memicu lockout eksponensial.
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@ojol.test
+              password: password
+      responses:
+        '200':
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/refresh:
+    post:
+      operationId: refresh
+      summary: Perbarui access token
+      description: >
+        Tukar refresh token (opaque) dengan access token baru. Endpoint ini
+        **tidak** butuh access token (dikecualikan dari middleware `auth.api`).
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+                  description: Plain refresh token yang diterima saat login/register.
+            example:
+              refresh_token: 'eyJ0eXAiOiJKV1QiLCJhbGc...'
+      responses:
+        '200':
+          description: Token diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Logout (revoke token aktif)
+      description: Logout dari perangkat saat ini. Membutuhkan Bearer access token.
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  description: Opsional. Bila diberikan, refresh token spesifik ikut dicabut.
+      responses:
+        '200':
+          description: Logout berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/password/email:
+    post:
+      operationId: forgotPassword
+      summary: Minta reset password
+      description: >
+        Meminta token reset. **Anti-enumeration**: selalu 200 dengan pesan sama
+        (token hanya dikirim bila akun terdaftar — di produksi via email, bukan body).
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+            example:
+              identifier: budi@ojol.test
+      responses:
+        '200':
+          description: Instruksi reset (bila akun ada)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPasswordResponse'
+  /auth/password/reset:
+    post:
+      operationId: resetPassword
+      summary: Reset password
+      description: Set password baru menggunakan token sekali-pakai dari forgot-password.
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+            example:
+              email: budi@ojol.test
+              token: 'abc123def456'
+              password: 'Newsecret1!'
+              password_confirmation: 'Newsecret1!'
+      responses:
+        '200':
+          description: Password berhasil direset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      summary: Verifikasi email
+      description: Verifikasi alamat email dengan kode OTP verifikasi.
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+            example:
+              email: budi@ojol.test
+              code: '123456'
+      responses:
+        '200':
+          description: Email terverifikasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Kode tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, phone, password, password_confirmation]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 255
+          pattern: '^[^<>{};"'']*$'
+          example: Budi Santoso
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: budi@ojol.test
+        phone:
+          type: string
+          pattern: '^[0-9+\-\s]{6,20}$'
+          example: '6281200000011'
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Min 8 karakter, huruf besar+kecil, angka, simbol.
+          example: 'Newsecret1!'
+        password_confirmation:
+          type: string
+          format: password
+          example: 'Newsecret1!'
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          description: Email ATAU nomor telepon.
+          example: admin@ojol.test
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password
+    ForgotPasswordRequest:
+      type: object
+      required: [identifier]
+      properties:
+        identifier:
+          type: string
+          description: Email atau nomor telepon akun.
+          example: budi@ojol.test
+    ResetPasswordRequest:
+      type: object
+      required: [email, token, password, password_confirmation]
+      properties:
+        email:
+          type: string
+          format: email
+        token:
+          type: string
+          description: Token sekali-pakai dari forgot-password.
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+    VerifyEmailRequest:
+      type: object
+      required: [email, code]
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          description: Kode OTP verifikasi email.
+          example: '123456'
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        status:
+          type: string
+          example: active
+        email_verified:
+          type: boolean
+        phone_verified:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+          example: [customer]
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Access token (JWT).
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          description: Detik hingga access token kedaluwarsa.
+          example: 3600
+        refresh_token:
+          type: string
+          description: Opaque refresh token.
+        refresh_token_expires_in:
+          type: integer
+          description: Detik hingga refresh token kedaluwarsa.
+      required: [token, token_type, expires_in, refresh_token]
+    AuthSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            token_type:
+              type: string
+            expires_in:
+              type: integer
+            refresh_token:
+              type: string
+            refresh_token_expires_in:
+              type: integer
+            user:
+              $ref: '#/components/schemas/User'
+        meta:
+          type: object
+          additionalProperties: true
+          example: {}
+        errors:
+          type: array
+          items: {}
+          example: []
+      required: [success, message, data, meta, errors]
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Jika akun terdaftar, instruksi reset telah dikirim'
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Demo only — di produksi dikirim via email.
+        meta:
+          type: object
+          example: {}
+        errors:
+          type: array
+          items: {}
+          example: []
+      required: [success, message, data, meta, errors]
+    MessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Logout success
+        data:
+          type: object
+          nullable: true
+          example: {}
+        meta:
+          type: object
+          example: {}
+        errors:
+          type: array
+          items: {}
+          example: []
+      required: [success, message, data, meta, errors]
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: 'Kode verifikasi tidak valid'
+        data:
+          type: object
+          example: {}
+        meta:
+          type: object
+          example: {}
+        errors:
+          type: array
+          items: {}
+          example: []
+      required: [success, message, data, meta, errors]
+  responses:
+    ValidationError:
+      description: Validation gagal (422)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Validation error
+              data:
+                type: object
+                example: {}
+              meta:
+                type: object
+                example: {}
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  email: ['Format email tidak valid.']
+          required: [success, message, data, meta, errors]
+    Unauthorized:
+      description: Tidak terautentikasi / token invalid (401)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Terlalu banyak request (429)
+      headers:
+        Retry-After:
+          description: Detik sebelum boleh coba lagi.
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: 'Terlalu banyak percobaan. Coba lagi dalam 60 detik.'
+              data:
+                type: object
+                example: {}
+              meta:
+                type: object
+                example: {}
+              errors:
+                type: object
+                properties:
+                  retry_after:
+                    type: integer
+                    nullable: true
+                example:
+                  retry_after: 60
+            required: [success, message, data, meta, errors]

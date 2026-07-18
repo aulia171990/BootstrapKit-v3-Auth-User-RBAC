@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Driver;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Driver;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -10,24 +11,21 @@ use Illuminate\Support\Facades\Validator;
 
 class DriverController extends Controller
 {
-    // List driver (admin) atau profil sendiri (driver)
+    // List driver (admin only) atau profil sendiri (driver/customer)
     public function index(Request $request)
     {
         $user = $request->user();
 
-        if ($user->roles()->where('name', 'admin')->exists()) {
-            return response()->json([
-                'success' => true,
-                'data' => Driver::with('user')->paginate(20),
-            ]);
+        if ($user->hasPermission('order.view.all')) {
+            return ApiResponse::success(Driver::with('user')->paginate(20));
         }
 
         $driver = $user->driver;
         if (! $driver) {
-            return response()->json(['success' => false, 'message' => 'Profil driver belum dibuat'], 404);
+            return ApiResponse::error('Profil driver belum dibuat', 404);
         }
 
-        return response()->json(['success' => true, 'data' => $driver->load('user')]);
+        return ApiResponse::success($driver->load('user'));
     }
 
     // Buat / update profil driver
@@ -39,11 +37,7 @@ class DriverController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $driver = Driver::updateOrCreate(
@@ -55,12 +49,12 @@ class DriverController extends Controller
             ]
         );
 
-        return response()->json(['success' => true, 'message' => 'Profil driver tersimpan', 'data' => $driver], 201);
+        return ApiResponse::created($driver, 'Profil driver tersimpan');
     }
 
     public function show(Driver $driver)
     {
-        return response()->json(['success' => true, 'data' => $driver->load('user')]);
+        return ApiResponse::success($driver->load('user'));
     }
 
     public function update(Request $request, Driver $driver)
@@ -74,16 +68,12 @@ class DriverController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $driver->update($validator->validated());
 
-        return response()->json(['success' => true, 'message' => 'Driver diupdate', 'data' => $driver]);
+        return ApiResponse::success($driver, 'Driver diupdate');
     }
 
     // Update lokasi (real-time). Untuk produksi: push ke Redis GEO.
@@ -95,16 +85,12 @@ class DriverController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $driver = $request->user()->driver;
         if (! $driver) {
-            return response()->json(['success' => false, 'message' => 'Profil driver belum dibuat'], 404);
+            return ApiResponse::error('Profil driver belum dibuat', 404);
         }
 
         $driver->update([
@@ -125,7 +111,7 @@ class DriverController extends Controller
         // driver ini dan masih aktif (accepted / ongoing) → live tracking.
         $this->broadcastLiveLocation($driver, (float) $request->latitude, (float) $request->longitude);
 
-        return response()->json(['success' => true, 'message' => 'Lokasi diupdate', 'data' => $driver->only('latitude', 'longitude', 'status')]);
+        return ApiResponse::success($driver->only('latitude', 'longitude', 'status'), 'Lokasi diupdate');
     }
 
     /**
@@ -156,11 +142,7 @@ class DriverController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $radius = $request->input('radius_km', 5);
@@ -182,7 +164,7 @@ class DriverController extends Controller
             ->with('user')
             ->get();
 
-        return response()->json(['success' => true, 'data' => $drivers]);
+        return ApiResponse::success($drivers);
     }
 
     protected function authorizeOwner(Request $request, Driver $driver): void

@@ -16,4 +16,16 @@ class Role extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'permission_role');
+    }
+
+    public function givePermission(string $code): void
+    {
+        if ($permission = Permission::where('code', $code)->first()) {
+            $this->permissions()->syncWithoutDetaching([$permission->id]);
+        }
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Http\Request;
@@ -14,15 +15,15 @@ class PaymentController extends Controller
     public function pay(Request $request, Order $order)
     {
         if ($order->customer_id !== $request->user()->id) {
-            return response()->json(['success' => false, 'message' => 'Bukan order Anda'], 403);
+            return ApiResponse::error('Bukan order Anda', 403);
         }
 
         if ($order->status !== Order::STATUS_COMPLETED) {
-            return response()->json(['success' => false, 'message' => 'Order belum selesai'], 422);
+            return ApiResponse::error('Order belum selesai', 422);
         }
 
         if ($order->payment && $order->payment->status === Payment::STATUS_PAID) {
-            return response()->json(['success' => false, 'message' => 'Sudah dibayar'], 422);
+            return ApiResponse::error('Sudah dibayar', 422);
         }
 
         $validator = Validator::make($request->all(), [
@@ -30,11 +31,7 @@ class PaymentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $payment = Payment::updateOrCreate(
@@ -47,7 +44,7 @@ class PaymentController extends Controller
             ]
         );
 
-        return response()->json(['success' => true, 'message' => 'Pembayaran berhasil', 'data' => $payment], 201);
+        return ApiResponse::created($payment, 'Pembayaran berhasil');
     }
 
     // Lihat status pembayaran order
@@ -59,12 +56,11 @@ class PaymentController extends Controller
         $isAdmin = $user->roles()->where('name', 'admin')->exists();
 
         if (! ($isOwner || $isDriver || $isAdmin)) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            return ApiResponse::error('Akses ditolak', 403);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $order->payment ?? (object) ['status' => Payment::STATUS_UNPAID],
-        ]);
+        return ApiResponse::success(
+            $order->payment ?? (object) ['status' => Payment::STATUS_UNPAID]
+        );
     }
 }

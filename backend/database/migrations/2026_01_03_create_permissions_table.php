@@ -1,2 +1,0 @@
-<?php
-// permissions migration skeleton

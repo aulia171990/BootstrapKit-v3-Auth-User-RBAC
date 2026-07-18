@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Order;
 
-use App\Http\Controllers\Controller;
+use App\Events\DriverLocationUpdated;
 use App\Events\OrderMatched;
 use App\Events\OrderStatusUpdated;
-use App\Events\DriverLocationUpdated;
+use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Driver;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
@@ -30,7 +31,7 @@ class OrderController extends Controller
             $orders = Order::where('customer_id', $user->id)->with(['customer', 'driver'])->paginate(20);
         }
 
-        return response()->json(['success' => true, 'data' => $orders]);
+        return ApiResponse::success($orders);
     }
 
     // Customer buat order
@@ -48,11 +49,7 @@ class OrderController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $data = $validator->validated();
@@ -72,32 +69,30 @@ class OrderController extends Controller
             OrderMatched::dispatch($order, $candidates);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Order dibuat',
-            'data' => $order,
+        return ApiResponse::created([
+            'order' => $order,
             'candidates' => collect($candidates)->map(fn ($d) => [
                 'driver_id' => $d->id,
                 'distance_km' => round($d->distance ?? 0, 2),
             ]),
-        ], 201);
+        ], 'Order dibuat');
     }
 
     public function show(Order $order)
     {
-        return response()->json(['success' => true, 'data' => $order->load(['customer', 'driver', 'histories'])]);
+        return ApiResponse::success($order->load(['customer', 'driver', 'histories']));
     }
 
     // Driver terima order
     public function accept(Request $request, Order $order)
     {
         if ($order->status !== Order::STATUS_PENDING) {
-            return response()->json(['success' => false, 'message' => 'Order tidak bisa diterima'], 422);
+            return ApiResponse::error('Order tidak bisa diterima', 422);
         }
 
         $driver = $request->user()->driver;
         if (! $driver) {
-            return response()->json(['success' => false, 'message' => 'Profil driver belum dibuat'], 404);
+            return ApiResponse::error('Profil driver belum dibuat', 404);
         }
 
         $order->update([
@@ -110,7 +105,7 @@ class OrderController extends Controller
         // Realtime: kabari customer bahwa driver sudah menerima order.
         \App\Events\OrderStatusUpdated::dispatch($order, Order::STATUS_ACCEPTED, 'Diterima driver');
 
-        return response()->json(['success' => true, 'message' => 'Order diterima', 'data' => $order]);
+        return ApiResponse::success($order, 'Order diterima');
     }
 
     // Update status order
@@ -121,11 +116,7 @@ class OrderController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $status = $validator->validated()['status'];
@@ -145,7 +136,7 @@ class OrderController extends Controller
             'Status diubah menjadi ' . $status
         );
 
-        return response()->json(['success' => true, 'message' => 'Status diupdate', 'data' => $order]);
+        return ApiResponse::success($order, 'Status diupdate');
     }
 
     // Lacak posisi driver (customer)
@@ -153,16 +144,13 @@ class OrderController extends Controller
     {
         $driver = $order->driver;
         if (! $driver) {
-            return response()->json(['success' => false, 'message' => 'Belum ada driver'], 404);
+            return ApiResponse::error('Belum ada driver', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'order_id' => $order->id,
-                'status' => $order->status,
-                'driver' => $driver->only('id', 'latitude', 'longitude', 'status', 'vehicle_type'),
-            ],
+        return ApiResponse::success([
+            'order_id' => $order->id,
+            'status' => $order->status,
+            'driver' => $driver->only('id', 'latitude', 'longitude', 'status', 'vehicle_type'),
         ]);
     }
 
@@ -177,21 +165,17 @@ class OrderController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return ApiResponse::validation($validator->errors()->toArray());
         }
 
         $driver = $order->driver;
         if (! $driver) {
-            return response()->json(['success' => false, 'message' => 'Belum ada driver'], 404);
+            return ApiResponse::error('Belum ada driver', 404);
         }
 
         // Hanya driver yang ditugaskan yang boleh push posisi.
         if ($request->user()->driver?->id !== $driver->id) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            return ApiResponse::error('Akses ditolak', 403);
         }
 
         $lat = (float) $request->latitude;
@@ -210,14 +194,10 @@ class OrderController extends Controller
             $request->speed !== null ? (float) $request->speed : null
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Posisi dikirim',
-            'data' => [
-                'order_id' => $order->id,
-                'driver' => $driver->only('id', 'latitude', 'longitude', 'status'),
-            ],
-        ]);
+        return ApiResponse::success([
+            'order_id' => $order->id,
+            'driver' => $driver->only('id', 'latitude', 'longitude', 'status'),
+        ], 'Posisi dikirim');
     }
 
     protected function recordHistory(Order $order, string $status, ?string $note = null): void

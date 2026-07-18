@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,9 +14,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // RBAC gate sederhana: user punya role tertentu.
-        Gate::define('role', function ($user, string $role) {
-            return $user->roles()->where('name', $role)->exists();
+        // Role gate: user holds the given role.
+        Gate::define('role', function (User $user, string $role) {
+            return $user->hasRole($role);
+        });
+
+        // Permission gate: user holds the given permission (via a role).
+        Gate::define('permission', function (User $user, string $permission) {
+            return $user->hasPermission($permission);
         });
     }
 }
