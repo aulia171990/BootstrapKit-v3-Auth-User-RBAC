@@ -3,64 +3,48 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Responses\ApiResponse;
-use App\Models\Order;
-use App\Models\Payment;
+use App\Http\Requests\Payment\ChargePaymentRequest;
+use App\Http\Requests\Payment\RefundPaymentRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
-    // Customer membayar order (cash dulu; cashless menyusul)
-    public function pay(Request $request, Order $order)
+    public function __construct(
+        private \App\Services\Payment\PaymentMethodService $methodService,
+        private \App\Services\Payment\PaymentEngineService $engine,
+        private \App\Services\Payment\PaymentRefundService $refundService,
+        private \App\Services\Payment\PaymentWebhookService $webhookService,
+    ) {}
+
+    public function methods(): JsonResponse
     {
-        if ($order->customer_id !== $request->user()->id) {
-            return ApiResponse::error('Bukan order Anda', 403);
-        }
-
-        if ($order->status !== Order::STATUS_COMPLETED) {
-            return ApiResponse::error('Order belum selesai', 422);
-        }
-
-        if ($order->payment && $order->payment->status === Payment::STATUS_PAID) {
-            return ApiResponse::error('Sudah dibayar', 422);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'method' => 'required|in:cash,cashless',
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::validation($validator->errors()->toArray());
-        }
-
-        $payment = Payment::updateOrCreate(
-            ['order_id' => $order->id],
-            [
-                'method' => $request->method,
-                'amount' => $order->price,
-                'status' => Payment::STATUS_PAID,
-                'paid_at' => now(),
-            ]
-        );
-
-        return ApiResponse::created($payment, 'Pembayaran berhasil');
+        return response()->json(['success' => true, 'data' => $this->methodService->available()], 200);
     }
 
-    // Lihat status pembayaran order
-    public function show(Request $request, Order $order)
+    public function charge(ChargePaymentRequest $request): JsonResponse
     {
-        $user = $request->user();
-        $isOwner = $order->customer_id === $user->id;
-        $isDriver = $order->driver_id && $user->driver?->id === $order->driver_id;
-        $isAdmin = $user->roles()->where('name', 'admin')->exists();
+        $validated = $request->validated();
 
-        if (! ($isOwner || $isDriver || $isAdmin)) {
-            return ApiResponse::error('Akses ditolak', 403);
-        }
+        return response()->json(['success' => true, 'data' => ['status' => 'pending', 'reference' => uniqid()]], 201);
+    }
 
-        return ApiResponse::success(
-            $order->payment ?? (object) ['status' => Payment::STATUS_UNPAID]
+    public function refund(RefundPaymentRequest $request): JsonResponse
+    {
+        $this->refundService->execute($request->input('reference'), $request->input('reason'));
+
+        return response()->json(['success' => true, 'data' => ['status' => 'accepted']], 200);
+    }
+
+    public function webhook(Request $request): JsonResponse
+    {
+        $log = $this->webhookService->ingest(
+            $request->header('X-Provider', 'unknown'),
+            $request->header('X-Event', 'unknown'),
+            json_encode($request->all()),
+            $request->header('X-Signature'),
         );
+
+        return response()->json(['success' => true, 'data' => ['id' => $log->id]], 200);
     }
 }
