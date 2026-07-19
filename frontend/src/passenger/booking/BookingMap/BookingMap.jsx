@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { TripPolyline, ZoomControls, CurrentLocationButton, RoutePreview, BaseMarker, DriverMarker, Sheet } from '../../../design-system/index.js';
+import { TripPolyline, ZoomControls, CurrentLocationButton, RoutePreview, BaseMarker, DriverMarker, Sheet, Spinner } from '../../../design-system/index.js';
 import { MapPin, Navigation } from 'lucide-react';
 import * as papi from '../../api.js';
 import './booking-map.css';
@@ -18,10 +18,11 @@ import './booking-map.css';
  * @param {ReactNode} sheetContent             rendered inside the bottom sheet
  * @param {boolean} sheetOpen                  bottom-sheet open state
  * @param {()=>void} onSheetClose
+ * @param {boolean} loading                    force the map loading state (3C-3I)
  */
 export default function BookingMap({
   pickup, destination, onCurrentLocation, sheetContent, sheetOpen = true, onSheetClose,
-  height = 320, className, mode = 'booking', driver,
+  height = 320, className, mode = 'booking', driver, loading = false,
 }) {
   const [route, setRoute] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -106,9 +107,11 @@ export default function BookingMap({
           <div className="pasv-bmap__grid" />
         </div>
 
-        {/* Map loading shimmer overlay */}
-        {status === 'loading' && (
-          <div className="pasv-bmap__loading"><div className="pasv-bmap__loading-bar" /></div>
+        {/* Map loading shimmer overlay (3C-3I: forced + route loading) */}
+        {(loading || status === 'loading') && (
+          <div className="pasv-bmap__loading">
+            <Spinner size="md" label="Memuat peta" />
+          </div>
         )}
 
         {/* Polyline route overlay */}

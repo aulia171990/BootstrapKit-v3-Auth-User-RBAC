@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon } from '../../design-system/index.js';
 import { Loader2, MapPin, Navigation, Clock, Search, X, RefreshCw, AlertTriangle, Radio } from 'lucide-react';
 import BookingMap from '../booking/BookingMap/index.js';
-import { useTripRealtime } from '../trip/tripRealtime.js';
+import { useTripRealtime, useTripConnection, CONNECTION } from '../trip/tripRealtime.js';
+import ConnectionBanner from './ConnectionBanner.jsx';
+import TripSkeleton from './TripSkeleton.jsx';
 import * as papi from '../api.js';
 import './trip.css';
 
@@ -23,13 +25,14 @@ import './trip.css';
  */
 const ESTIMATED_WAIT_SEC = 30;
 
-export default function WaitingDriver({ booking, onCancel, onDriverAssigned }) {
+export default function WaitingDriver({ booking, onCancel, onDriverAssigned, loading = false }) {
   const [uiState, setUiState] = useState('searching'); // searching | cancelled | timeout | error
   const [attempt, setAttempt] = useState(0);
   const [remaining, setRemaining] = useState(ESTIMATED_WAIT_SEC);
   const [cancelBusy, setCancelBusy] = useState(false);
 
   const event = useTripRealtime(booking?.id);
+  const { connection, retry: retryConn } = useTripConnection();
   const timerRef = useRef(null);
 
   // Countdown + timeout (passes through events; if no driver in time → timeout).
@@ -72,6 +75,16 @@ export default function WaitingDriver({ booking, onCancel, onDriverAssigned }) {
     }
   }, [event, attempt, booking, onDriverAssigned]);
 
+  if (loading || !booking) {
+    return (
+      <div className="pasv-trip pasv-trip--waiting">
+        <ConnectionBanner connection={connection} onRetry={retryConn} />
+        <TripSkeleton />
+      </div>
+    );
+  }
+
+  const offline = connection !== CONNECTION.ONLINE;
   const cancel = async () => {
     if (cancelBusy) return;
     setCancelBusy(true);
@@ -103,6 +116,7 @@ export default function WaitingDriver({ booking, onCancel, onDriverAssigned }) {
 
   return (
     <div className="pasv-trip pasv-trip--waiting">
+      <ConnectionBanner connection={connection} onRetry={retryConn} />
       <header className="pasv-trip__bar">
         <span className="pasv-trip__status" role="status" aria-live="polite">
           <Icon icon={Radio} size="xs" /> {booking?.id || '—'}
@@ -118,6 +132,7 @@ export default function WaitingDriver({ booking, onCancel, onDriverAssigned }) {
         onCurrentLocation={() => {}}
         sheetOpen={false}
         height={300}
+        loading={offline}
       />
 
       <main className="pasv-book__scroll pasv-wait">

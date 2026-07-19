@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Button, Icon, Avatar, LiveStatusBadge } from '../../design-system/index.js';
 import { Car, Star, MapPin, Navigation, Phone, MessageCircle, X, Radio, Shield, Clock } from 'lucide-react';
 import BookingMap from '../booking/BookingMap/index.js';
-import { useTripRealtime } from '../trip/tripRealtime.js';
+import { useTripRealtime, useTripConnection, CONNECTION } from '../trip/tripRealtime.js';
 import { useUnread } from '../communication/index.js';
+import ConnectionBanner from './ConnectionBanner.jsx';
+import TripSkeleton from './TripSkeleton.jsx';
 import * as papi from '../api.js';
 import './trip.css';
 
@@ -32,13 +34,14 @@ import './trip.css';
  * @param {()=>void} onSafety        open Safety Center (3F)
  */
 export default function DriverAssigned({
-  booking, driver, cancelEnabled = true, onCancel, onArriving, onCall, onChat, onSafety,
+  booking, driver, cancelEnabled = true, onCancel, onArriving, onCall, onChat, onSafety, loading = false,
 }) {
   const [uiState, setUiState] = useState('assigned'); // assigned | cancelled | error
   const [cancelBusy, setCancelBusy] = useState(false);
 
   const event = useTripRealtime(booking?.id);
   const unread = useUnread(booking?.id);
+  const { connection, retry } = useTripConnection();
 
   useEffect(() => {
     if (!event) return;
@@ -72,8 +75,20 @@ export default function DriverAssigned({
   const rating = typeof driver?.rating === 'number' ? driver.rating.toFixed(1) : '—';
   const eta = driver?.etaMin != null ? `${driver.etaMin} mnt` : '—';
 
+  if (loading || !driver) {
+    return (
+      <div className="pasv-trip pasv-trip--assigned">
+        <ConnectionBanner connection={connection} onRetry={retry} />
+        <TripSkeleton />
+      </div>
+    );
+  }
+
+  const offline = connection !== CONNECTION.ONLINE;
+
   return (
     <div className="pasv-trip pasv-trip--assigned">
+      <ConnectionBanner connection={connection} onRetry={retry} />
       <header className="pasv-trip__bar">
         <span className="pasv-trip__status" role="status" aria-live="polite">
           <Icon icon={Radio} size="xs" /> Driver menuju lokasi
@@ -90,6 +105,7 @@ export default function DriverAssigned({
         onCurrentLocation={() => {}}
         sheetOpen={false}
         height={300}
+        loading={offline}
       />
 
       <main className="pasv-book__scroll pasv-assigned">

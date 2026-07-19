@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 /**
  * Trip Realtime client (3C) — reusable across Waiting Driver (3A), Driver
@@ -20,9 +20,15 @@ import { useEffect, useRef, useState, useCallback } from 'react';
  *   configured `new Echo({...})`. The hook will subscribe to
  *   `echo.private('booking.{id}')` and forward the events above. Until then it
  *   uses a deterministic MOCK simulator so the screens are fully testable and
- *   demonstrable without a backend (consistent with the rest of the passenger
- *   app, which runs on sample data). This avoids fabricating fetch URLs or
+ *   demonstrable without a backend. This avoids fabricating fetch URLs or
  *   duplicating backend business logic.
+ *
+ * CONNECTION (3C-3I): a connection state machine (connecting / online /
+ *   offline / reconnecting) driven by `navigator.onLine` and online/offline
+ *   events, with a manual `retry()`. Battery-friendly: TripProgress is
+ *   rate-limited and paused while the tab is hidden (see THROTTLE_MS /
+ *   document.hidden guards), so we don't burn CPU/network/animation on updates
+ *   nobody is looking at.
  *
  * No business logic is duplicated here — it only translates transport events
  * into the trip event contract.
@@ -32,6 +38,47 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 let _echo = null;
 export function setTripEcho(echo) { _echo = echo; }
 export function getTripEcho() { return _echo; }
+
+// Battery-friendly: minimum gap between TripProgress forwards (ms).
+const THROTTLE_MS = 2000;
+
+export const CONNECTION = {
+  CONNECTING: 'connecting',
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+  RECONNECTING: 'reconnecting',
+};
+
+// ---- Connection state (module-level, observable) ----
+const _online = () => (typeof navigator === 'undefined' ? true : navigator.onLine !== false);
+let _conn = _online() ? CONNECTION.ONLINE : CONNECTION.OFFLINE;
+const _connListeners = new Set();
+
+function setConnection(next) {
+  if (_conn === next) return;
+  _conn = next;
+  _connListeners.forEach((cb) => cb(_conn));
+}
+export function getConnection() { return _conn; }
+export function onConnectionChange(cb) {
+  _connListeners.add(cb);
+  return () => _connListeners.delete(cb);
+}
+
+// React to browser connectivity changes.
+if (typeof window !== 'undefined') {
+  window.addEventListener('offline', () => setConnection(CONNECTION.OFFLINE));
+  window.addEventListener('online', () => {
+    setConnection(CONNECTION.RECONNECTING);
+    setTimeout(() => setConnection(_online() ? CONNECTION.ONLINE : CONNECTION.OFFLINE), 800);
+  });
+}
+
+// Manual retry: forces a reconnect cycle.
+export function retryConnection() {
+  setConnection(CONNECTION.RECONNECTING);
+  setTimeout(() => setConnection(_online() ? CONNECTION.ONLINE : CONNECTION.OFFLINE), 800);
+}
 
 const EVENTS = ['BookingAccepted', 'DriverAssigned', 'DriverArriving', 'PickupConfirmed', 'TripProgress', 'TripCompleted', 'DispatchRetry', 'BookingCancelled', 'BookingExpired'];
 
@@ -45,14 +92,31 @@ export function subscribeTrip(bookingId, handler) {
   const echo = getTripEcho();
   if (echo && bookingId) {
     const ch = echo.private(`booking.${bookingId}`);
-    EVENTS.forEach((ev) => ch.listen(`.${ev}`, (p) => handler(ev, p)));
+    let lastProgress = 0;
+    EVENTS.forEach((ev) => ch.listen(`.${ev}`, (p) => {
+      // Battery-friendly: rate-limit high-frequency telemetry.
+      if (ev === 'TripProgress') {
+        const now = Date.now();
+        if (now - lastProgress < THROTTLE_MS) return;
+        lastProgress = now;
+      }
+      handler(ev, p);
+    }));
     return () => EVENTS.forEach((ev) => ch.stopListening(`.${ev}`));
   }
   // Mock simulator (deterministic, testable). Emits DispatchRetry then
   // DriverAssigned after `assignInMs`, or Expired if `expireInMs` is set.
   let cancelled = false;
   const timers = [];
-  const emit = (ev, p) => { if (!cancelled) handler(ev, p); };
+  const emit = (ev, p) => {
+    if (cancelled) return;
+    // Battery-friendly: don't push in-progress telemetry while the tab is hidden.
+    if (ev === 'TripProgress' && typeof document !== 'undefined' && document.hidden) return;
+    handler(ev, p);
+  };
+  // Surface a brief connecting → online transition.
+  setConnection(CONNECTION.CONNECTING);
+  timers.push(setTimeout(() => { if (_online()) setConnection(CONNECTION.ONLINE); }, 300));
   emit('BookingAccepted', { booking: { id: bookingId } });
   if (typeof globalThis !== 'undefined') {
     timers.push(setTimeout(() => emit('DispatchRetry', { attempt: 1, nextEtaSec: 30 }), 4000));
@@ -83,6 +147,7 @@ const MOCK_DRIVER = {
 
 /**
  * React hook: subscribe to the trip channel and expose the latest event.
+ * Backward compatible — returns the latest event object ({ type, payload }).
  * @param {string} bookingId
  */
 export function useTripRealtime(bookingId) {
@@ -98,4 +163,15 @@ export function useTripRealtime(bookingId) {
   }, [bookingId]);
 
   return event;
+}
+
+/**
+ * React hook: observe trip connection state (3C-3I) + manual retry.
+ * @returns {{ connection: string, retry: () => void }}
+ */
+export function useTripConnection() {
+  const [connection, setConnectionState] = useState(getConnection());
+  useEffect(() => onConnectionChange(setConnectionState), []);
+  const retry = useCallback(() => retryConnection(), []);
+  return { connection, retry };
 }

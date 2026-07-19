@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Icon, Avatar } from '../../design-system/index.js';
 import { CheckCircle2, Receipt as ReceiptIcon, Star, Car, Route as RouteIcon, Clock, Wallet, ArrowRight } from 'lucide-react';
+import { useTripConnection } from '../trip/tripRealtime.js';
+import ConnectionBanner from './ConnectionBanner.jsx';
+import TripSkeleton from './TripSkeleton.jsx';
 import * as papi from '../api.js';
 import './completed.css';
 
@@ -13,11 +16,22 @@ import './completed.css';
  *
  * Data is sample (no backend). Swapping in a real trip API needs no UI changes.
  */
-export default function TripCompleted({ booking, driver, onReceipt, onRate, onHome }) {
+export default function TripCompleted({ booking, driver, onReceipt, onRate, onHome, loading = false }) {
   const [summary, setSummary] = useState(null);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [rated, setRated] = useState(false);
+
+  const { connection, retry } = useTripConnection();
+
+  if (loading || !booking) {
+    return (
+      <div className="pasv-done">
+        <ConnectionBanner connection={connection} onRetry={retry} />
+        <TripSkeleton />
+      </div>
+    );
+  }
 
   useEffect(() => {
     papi.getTripSummary(booking?.id).then(setSummary);
@@ -35,6 +49,7 @@ export default function TripCompleted({ booking, driver, onReceipt, onRate, onHo
 
   return (
     <div className="pasv-done">
+      <ConnectionBanner connection={connection} onRetry={retry} />
       {/* Success animation */}
       <div className="pasv-done__anim" role="img" aria-label="Perjalanan selesai">
         <CheckCircle2 size={84} strokeWidth={1.6} className="pasv-done__check" />

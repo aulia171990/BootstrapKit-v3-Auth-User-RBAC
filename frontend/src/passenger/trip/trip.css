@@ -4,6 +4,45 @@
    Reuses --ds-* tokens. Large touch targets; reduced-motion safe.
    ============================================================ */
 
+/* ---- Connection banner (3C-3I) ---- */
+.pasv-conn {
+  display: flex; align-items: center; gap: var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-size: var(--ds-text-caption-sm-size, 12px); font-weight: 600;
+}
+.pasv-conn--offline { background: color-mix(in srgb, var(--ds-color-danger) 14%, transparent); color: var(--ds-color-danger); }
+.pasv-conn--reconnect { background: color-mix(in srgb, var(--ds-color-warning) 16%, transparent); color: var(--ds-color-warning); }
+.pasv-conn__msg { flex: 1; }
+.pasv-conn__spin { flex: none; }
+.pasv-conn__retry {
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  background: color-mix(in srgb, var(--ds-color-danger) 16%, transparent);
+  color: var(--ds-color-danger); border: 1px solid currentColor;
+  border-radius: var(--ds-radius-sm); padding: 4px 10px; font-weight: 700;
+}
+
+/* ---- Trip skeleton (3C-3I) ---- */
+.pasv-trip-skel { display: flex; flex-direction: column; gap: var(--ds-space-4); padding: var(--ds-space-4); }
+.pasv-trip-skel__card { display: flex; align-items: center; gap: var(--ds-space-3); }
+.pasv-trip-skel__lines { flex: 1; }
+.pasv-trip-skel__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-3); }
+
+/* ---- Map loading shimmer (3C-3I) ---- */
+.pasv-bmap__loading {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--ds-color-surface-2) 70%, transparent);
+  backdrop-filter: blur(1px);
+}
+
+/* ---- Trip status spinner (3A) ---- */
+.pasv-trip__spin { animation: pasv-spin 1.1s linear infinite; color: var(--ds-color-primary); }
+@keyframes pasv-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pasv-trip__spin, .pasv-conn__spin { animation: none; }
+}
+
 .pasv-trip--waiting, .pasv-trip--assigned {
   min-height: 100vh;
   display: flex;

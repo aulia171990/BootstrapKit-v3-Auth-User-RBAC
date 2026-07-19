@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon, Avatar } from '../../design-system/index.js';
 import { Car, MapPin, Navigation, Clock, Route as RouteIcon, CheckCircle2, Bell } from 'lucide-react';
 import BookingMap from '../booking/BookingMap/index.js';
-import { useTripRealtime } from '../trip/tripRealtime.js';
+import { useTripRealtime, useTripConnection, CONNECTION } from '../trip/tripRealtime.js';
+import ConnectionBanner from './ConnectionBanner.jsx';
+import TripSkeleton from './TripSkeleton.jsx';
 import './trip.css';
 
 /**
@@ -27,7 +29,7 @@ import './trip.css';
  * sample backend); the realtime layer remains the single source of truth for
  * state transitions, so swapping in real telemetry needs no UI changes.
  */
-export default function DriverArriving({ booking, driver, onCancel, onPickupConfirmed }) {
+export default function DriverArriving({ booking, driver, onCancel, onPickupConfirmed, loading = false }) {
   const eta0 = Math.max(1, Math.round((driver?.etaMin || 3))); // minutes
   const dist0 = Math.max(0.1, Number(driver?.distanceKm || 0.4)); // km
 
@@ -37,6 +39,7 @@ export default function DriverArriving({ booking, driver, onCancel, onPickupConf
   const [confirmed, setConfirmed] = useState(false);
 
   const event = useTripRealtime(booking?.id);
+  const { connection, retry } = useTripConnection();
 
   // Tick: ETA countdown → arrival → waiting timer.
   // Arrival is simulated to complete in a fixed window (ARRIVE_SEC) so the
@@ -62,6 +65,17 @@ export default function DriverArriving({ booking, driver, onCancel, onPickupConf
     }
   }, [event, booking, driver, onPickupConfirmed]);
 
+  if (loading || !driver) {
+    return (
+      <div className="pasv-trip pasv-trip--arriving">
+        <ConnectionBanner connection={connection} onRetry={retry} />
+        <TripSkeleton />
+      </div>
+    );
+  }
+
+  const offline = connection !== CONNECTION.ONLINE;
+
   const confirmPickup = () => {
     if (confirmed) return;
     setConfirmed(true);
@@ -76,6 +90,7 @@ export default function DriverArriving({ booking, driver, onCancel, onPickupConf
 
   return (
     <div className="pasv-trip pasv-trip--arriving">
+      <ConnectionBanner connection={connection} onRetry={retry} />
       <header className="pasv-trip__bar">
         <span className="pasv-trip__status" role="status" aria-live="polite">
           <Icon icon={Car} size="xs" /> {arrived ? 'Driver tiba' : 'Driver menuju Anda'}
@@ -92,6 +107,7 @@ export default function DriverArriving({ booking, driver, onCancel, onPickupConf
         onCurrentLocation={() => {}}
         sheetOpen={false}
         height={300}
+        loading={offline}
       />
 
       <main className="pasv-book__scroll pasv-arriving">

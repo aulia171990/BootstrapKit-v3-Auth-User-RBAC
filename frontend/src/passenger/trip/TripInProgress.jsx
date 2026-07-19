@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon, Avatar, StatusIndicator } from '../../design-system/index.js';
 import { Navigation, MapPin, Car, Clock, Route as RouteIcon, Share2, Phone, MessageCircle, Square, Shield, CheckCircle2 } from 'lucide-react';
 import BookingMap from '../booking/BookingMap/index.js';
-import { useTripRealtime } from '../trip/tripRealtime.js';
+import { useTripRealtime, useTripConnection, CONNECTION } from '../trip/tripRealtime.js';
 import { useUnread } from '../communication/index.js';
+import ConnectionBanner from './ConnectionBanner.jsx';
+import TripSkeleton from './TripSkeleton.jsx';
 import * as papi from '../api.js';
 import './trip.css';
 
@@ -22,7 +24,7 @@ import './trip.css';
  * TripProgress updates ETA/distance/progress, TripCompleted ends the trip.
  * Swapping in real telemetry needs no UI changes.
  */
-export default function TripInProgress({ booking, driver, operator, onCall, onChat, onSafety, onCancel, onCompleted, onStopTrip }) {
+export default function TripInProgress({ booking, driver, operator, onCall, onChat, onSafety, onCancel, onCompleted, onStopTrip, loading = false }) {
   const totalKm = Number(booking?.distanceKm || driver?.distanceKm || 8.4);
   const totalMin = Math.max(1, Math.round((driver?.etaMin || 22)));
 
@@ -36,6 +38,7 @@ export default function TripInProgress({ booking, driver, operator, onCall, onCh
 
   const event = useTripRealtime(booking?.id);
   const unread = useUnread(booking?.id);
+  const { connection, retry } = useTripConnection();
 
   // Local simulation tick (realtime telemetry overrides below).
   useEffect(() => {
@@ -96,8 +99,20 @@ export default function TripInProgress({ booking, driver, operator, onCall, onCh
   const distLabel = `${distKm.toFixed(2)} km`;
   const elapsedLabel = formatClock(elapsed);
 
+  if (loading || !driver) {
+    return (
+      <div className="pasv-trip pasv-trip--inprogress">
+        <ConnectionBanner connection={connection} onRetry={retry} />
+        <TripSkeleton />
+      </div>
+    );
+  }
+
+  const offline = connection !== CONNECTION.ONLINE;
+
   return (
     <div className="pasv-trip pasv-trip--inprogress">
+      <ConnectionBanner connection={connection} onRetry={retry} />
       <header className="pasv-trip__bar">
         <span className="pasv-trip__status" role="status" aria-live="polite">
           <Icon icon={Navigation} size="xs" /> {completed ? 'Selesai' : 'Perjalanan berlangsung'}
@@ -114,6 +129,7 @@ export default function TripInProgress({ booking, driver, operator, onCall, onCh
         onCurrentLocation={() => {}}
         sheetOpen={false}
         height={300}
+        loading={offline}
       />
 
       {/* TRIP STATUS (realtime notification) */}
