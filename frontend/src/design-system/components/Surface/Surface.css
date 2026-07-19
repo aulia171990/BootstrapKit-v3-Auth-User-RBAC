@@ -1,0 +1,23 @@
+/* Surface — themed surface building block */
+.ds-surface {
+  background: var(--ds-color-surface);
+  color: var(--ds-color-text);
+}
+.ds-surface[data-elevation='xs'] { box-shadow: var(--ds-shadow-xs); }
+.ds-surface[data-elevation='sm'] { box-shadow: var(--ds-shadow-sm); }
+.ds-surface[data-elevation='md'] { box-shadow: var(--ds-shadow-md); }
+.ds-surface[data-elevation='lg'] { box-shadow: var(--ds-shadow-lg); }
+.ds-surface[data-elevation='xl'] { box-shadow: var(--ds-shadow-xl); }
+
+/* Paper — elevated floating sheet */
+.ds-paper {
+  background: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border);
+  color: var(--ds-color-text);
+  box-shadow: var(--ds-shadow-md);
+}
+.ds-paper[data-elevation='xs'] { box-shadow: var(--ds-shadow-xs); }
+.ds-paper[data-elevation='sm'] { box-shadow: var(--ds-shadow-sm); }
+.ds-paper[data-elevation='md'] { box-shadow: var(--ds-shadow-md); }
+.ds-paper[data-elevation='lg'] { box-shadow: var(--ds-shadow-lg); }
+.ds-paper[data-elevation='xl'] { box-shadow: var(--ds-shadow-xl); }

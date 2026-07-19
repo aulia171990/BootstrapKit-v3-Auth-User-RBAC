@@ -1,0 +1,42 @@
+/* ============================================================
+   Design System — Base reset & root defaults
+   ------------------------------------------------------------
+   - Box-sizing normalization
+   - Default font / color-scheme wiring
+   - Body uses theme-aware tokens (overridable by app CSS)
+   All design tokens are namespaced with the `--ds-` prefix so
+   they never collide with existing app variables.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-family: var(--ds-font-sans);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--ds-font-sans);
+  background-color: var(--ds-color-bg);
+  color: var(--ds-color-text);
+  line-height: var(--ds-text-body-line);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ds-color-focus);
+  outline-offset: 2px;
+}

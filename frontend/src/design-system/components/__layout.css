@@ -1,0 +1,78 @@
+/* ============================================================
+   Design System — Layout system (shared)
+   ============================================================ */
+
+/* ---------- App Shell (Navbar + Sidebar + Content) ---------- */
+.ds-app-shell { display: flex; flex-direction: column; min-height: 100vh; background: var(--ds-color-bg); }
+.ds-app-shell__body { display: flex; flex: 1; min-height: 0; }
+.ds-app-shell__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ds-app-shell__content { flex: 1; padding: var(--ds-space-6); overflow-y: auto; }
+
+/* ---------- Dashboard Layout (sidebar + topbar + content) ---------- */
+.ds-dash { display: grid; grid-template-columns: var(--ds-dash-side, 260px) 1fr; grid-template-rows: auto 1fr; min-height: 100vh; background: var(--ds-color-bg); }
+.ds-dash__sidebar { grid-row: 1 / -1; }
+.ds-dash__topbar { grid-column: 2; display: flex; align-items: center; gap: var(--ds-space-4); padding: var(--ds-space-3) var(--ds-space-6); background: var(--ds-color-surface); border-bottom: 1px solid var(--ds-color-border); position: sticky; top: 0; z-index: var(--ds-z-sticky); }
+.ds-dash__content { grid-column: 2; padding: var(--ds-space-6); overflow-y: auto; }
+.ds-dash__sidebar--collapse { --ds-dash-side: 72px; }
+@media (max-width: 1023px) {
+  .ds-dash { grid-template-columns: 1fr; }
+  .ds-dash__sidebar { display: none; }
+  .ds-dash__topbar, .ds-dash__content { grid-column: 1; }
+}
+
+/* ---------- Authentication Layout (centered card) ---------- */
+.ds-auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--ds-space-6); background: var(--ds-color-bg); }
+.ds-auth__card { width: 100%; max-width: 420px; background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-xl); box-shadow: var(--ds-shadow-lg); padding: var(--ds-space-8); }
+.ds-auth__brand { display: flex; align-items: center; justify-content: center; gap: var(--ds-space-2); margin-bottom: var(--ds-space-6); font-weight: var(--ds-font-weight-bold); font-size: var(--ds-text-title-size); color: var(--ds-color-text-strong); }
+.ds-auth__footer { margin-top: var(--ds-space-6); text-align: center; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+
+/* ---------- Map Layout (map + side panel overlay) ---------- */
+.ds-map-layout { position: relative; width: 100%; height: 100vh; overflow: hidden; background: var(--ds-color-bg); }
+.ds-map-layout__map { position: absolute; inset: 0; }
+.ds-map-layout__panel { position: absolute; top: var(--ds-space-4); bottom: var(--ds-space-4); width: var(--ds-map-panel-w, 360px); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-lg); display: flex; flex-direction: column; overflow: hidden; z-index: var(--ds-z-raised); }
+.ds-map-layout__panel[data-side='left'] { left: var(--ds-space-4); }
+.ds-map-layout__panel[data-side='right'] { right: var(--ds-space-4); }
+.ds-map-layout__panel-header { display: flex; align-items: center; justify-content: space-between; padding: var(--ds-space-4); border-bottom: 1px solid var(--ds-color-border); font-weight: var(--ds-font-weight-semibold); color: var(--ds-color-text-strong); }
+.ds-map-layout__panel-body { flex: 1; overflow-y: auto; padding: var(--ds-space-4); }
+
+/* ---------- Split Layout ---------- */
+.ds-split { display: grid; gap: var(--ds-space-0, 0); min-height: 0; }
+.ds-split__pane { min-width: 0; min-height: 0; overflow: auto; }
+.ds-split__divider { background: var(--ds-color-border); }
+.ds-split[data-orientation='horizontal'] { grid-auto-flow: column; grid-auto-columns: 1fr; }
+.ds-split[data-orientation='horizontal'] .ds-split__divider { width: 1px; }
+.ds-split[data-orientation='vertical'] { grid-auto-flow: row; grid-auto-rows: 1fr; }
+.ds-split[data-orientation='vertical'] .ds-split__divider { height: 1px; }
+
+/* ---------- Responsive Container ---------- */
+.ds-rcontainer { width: 100%; margin-inline: auto; padding-inline: var(--ds-space-4); }
+@media (min-width: 640px)  { .ds-rcontainer { max-width: 640px; } }
+@media (min-width: 1024px) { .ds-rcontainer { max-width: 1024px; } }
+@media (min-width: 1280px) { .ds-rcontainer { max-width: 1280px; } }
+@media (min-width: 1536px) { .ds-rcontainer { max-width: 1536px; } }
+
+/* ---------- Responsive Grid ---------- */
+.ds-rgrid { display: grid; gap: var(--ds-space-4); grid-template-columns: repeat(var(--ds-rgrid-cols, 1), minmax(0, 1fr)); }
+.ds-rgrid[data-cols='1']  { --ds-rgrid-cols: 1; }
+.ds-rgrid[data-cols='2']  { --ds-rgrid-cols: 2; }
+.ds-rgrid[data-cols='3']  { --ds-rgrid-cols: 3; }
+.ds-rgrid[data-cols='4']  { --ds-rgrid-cols: 4; }
+.ds-rgrid[data-cols='6']  { --ds-rgrid-cols: 6; }
+.ds-rgrid[data-cols='12'] { --ds-rgrid-cols: 12; }
+@media (min-width: 640px)  { .ds-rgrid[data-cols-sm]  { --ds-rgrid-cols: var(--ds-rgrid-sm, 1); } }
+@media (min-width: 1024px) { .ds-rgrid[data-cols-md]  { --ds-rgrid-cols: var(--ds-rgrid-md, 1); } }
+@media (min-width: 1280px) { .ds-rgrid[data-cols-lg]  { --ds-rgrid-cols: var(--ds-rgrid-lg, 1); } }
+@media (min-width: 1536px) { .ds-rgrid[data-cols-xl]  { --ds-rgrid-cols: var(--ds-rgrid-xl, 1); } }
+
+/* ---------- Responsive Sidebar ---------- */
+.ds-rsidebar { display: flex; flex-direction: column; gap: var(--ds-space-1); width: var(--ds-rsidebar-w, 260px); height: 100%; padding: var(--ds-space-4); background: var(--ds-color-surface); border-right: 1px solid var(--ds-color-border); overflow-y: auto; transition: width var(--ds-duration-base) var(--ds-ease-standard); }
+.ds-rsidebar.is-collapsed { --ds-rsidebar-w: 72px; }
+.ds-rsidebar__toggle { align-self: flex-end; display: inline-flex; border: 0; background: transparent; color: var(--ds-color-text-muted); cursor: pointer; border-radius: var(--ds-radius-sm); padding: var(--ds-space-1); }
+.ds-rsidebar__toggle:hover { color: var(--ds-color-text); background: var(--ds-color-surface-2); }
+.ds-rsidebar__label { white-space: nowrap; overflow: hidden; }
+.ds-rsidebar.is-collapsed .ds-rsidebar__label { opacity: 0; }
+@media (max-width: 1023px) {
+  .ds-rsidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: var(--ds-z-drawer); transform: translateX(-100%); box-shadow: var(--ds-shadow-xl); }
+  .ds-rsidebar.is-open { transform: translateX(0); }
+  .ds-rsidebar__backdrop { position: fixed; inset: 0; background: var(--ds-color-overlay); z-index: calc(var(--ds-z-drawer) - 1); }
+}

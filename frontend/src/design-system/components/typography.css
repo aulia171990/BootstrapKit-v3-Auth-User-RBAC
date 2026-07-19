@@ -1,0 +1,26 @@
+/* Shared typography utilities used by Label / Link / Text / Heading helpers */
+.ds-label {
+  display: inline-block;
+  font-size: var(--ds-text-label-size);
+  font-weight: var(--ds-text-label-weight);
+  color: var(--ds-color-text);
+  margin-bottom: var(--ds-space-1);
+}
+.ds-label.is-disabled { color: var(--ds-color-text-muted); }
+.ds-label__req { color: var(--ds-color-danger); margin-left: 2px; }
+
+.ds-link {
+  color: var(--ds-color-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--ds-transition-colors);
+}
+.ds-link:hover { color: var(--ds-color-primary-hover); }
+.ds-link:focus-visible { outline: 2px solid var(--ds-color-focus); outline-offset: 2px; border-radius: 2px; }
+.ds-link--primary { color: var(--ds-color-primary); }
+.ds-link--secondary { color: var(--ds-color-secondary); }
+.ds-link--muted { color: var(--ds-color-text-muted); }
+.ds-link--danger { color: var(--ds-color-danger); }
+.ds-link--u-hover:hover { text-decoration: underline; }
+.ds-link--u-always { text-decoration: underline; }
+.ds-link--u-none { text-decoration: none; }

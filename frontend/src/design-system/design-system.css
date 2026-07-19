@@ -1,0 +1,24 @@
+/* ============================================================
+   Design System — Entry / Aggregator
+   ------------------------------------------------------------
+   Import this single file to load the entire design system:
+     import '../design-system/design-system.css';
+   Order matters: base + tokens + theme.
+   ============================================================ */
+
+/* Base reset & root defaults */
+@import './tokens/_base.css';
+
+/* Design tokens */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/radius.css';
+@import './tokens/shadow.css';
+@import './tokens/opacity.css';
+@import './tokens/z-index.css';
+@import './tokens/breakpoints.css';
+@import './tokens/motion.css';
+
+/* Theme controller (light / dark / system) */
+@import './theme/theme.css';

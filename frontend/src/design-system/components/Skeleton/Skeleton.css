@@ -1,0 +1,12 @@
+.ds-skeleton-wrap { display: flex; flex-direction: column; gap: var(--ds-space-2); width: 100%; }
+.ds-skeleton {
+  display: block;
+  background: linear-gradient(90deg, var(--ds-color-surface-2) 25%, var(--ds-color-surface-3) 37%, var(--ds-color-surface-2) 63%);
+  background-size: 400% 100%;
+  animation: ds-skeleton-shine 1.4s ease infinite;
+}
+.ds-skeleton--text { height: 0.75em; border-radius: var(--ds-radius-sm); }
+.ds-skeleton--rect { width: 100%; min-height: 16px; }
+.ds-skeleton--circle { aspect-ratio: 1; }
+@keyframes ds-skeleton-shine { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .ds-skeleton { animation: none; } }

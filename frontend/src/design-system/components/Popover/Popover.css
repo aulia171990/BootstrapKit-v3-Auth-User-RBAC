@@ -1,0 +1,16 @@
+/* Popover — trigger-anchored floating panel */
+.ds-popover { position: relative; display: inline-block; }
+.ds-popover__trigger { all: unset; cursor: pointer; display: inline-flex; }
+.ds-popover__panel {
+  position: absolute; z-index: var(--ds-z-popover);
+  background: var(--ds-color-surface); border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-md); box-shadow: var(--ds-shadow-lg);
+  padding: var(--ds-space-3); min-width: 200px; max-width: 320px;
+  animation: ds-pop var(--ds-duration-fast) var(--ds-ease-standard);
+}
+.ds-popover--bottom { top: calc(100% + var(--ds-space-1)); left: 0; }
+.ds-popover--top { bottom: calc(100% + var(--ds-space-1)); left: 0; }
+.ds-popover--left { right: calc(100% + var(--ds-space-1)); top: 0; }
+.ds-popover--right { left: calc(100% + var(--ds-space-1)); top: 0; }
+@keyframes ds-pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .ds-popover__panel { animation: none; } }

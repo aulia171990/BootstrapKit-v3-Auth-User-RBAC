@@ -2,7 +2,7 @@
 
 namespace App\Services\Admin;
 
-use App\Repositories\PaymentRepository;
+use App\Repositories\Payment\PaymentRepository;
 
 class PaymentManagementService
 {

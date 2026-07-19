@@ -1,0 +1,175 @@
+/* ============================================================
+   Passenger App — Booking (Phase 3B) mobile styles
+   Scoped under .pasv-book-* so it never collides with Admin/Home.
+   ============================================================ */
+.pasv-book { display: flex; flex-direction: column; min-height: 100vh; background: var(--ds-color-bg); color: var(--ds-color-text); }
+.pasv-book__bar { display: flex; align-items: center; gap: var(--ds-space-2); padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-color-surface); border-bottom: 1px solid var(--ds-color-border); position: sticky; top: 0; z-index: 20; }
+.pasv-book__back { width: 40px; height: 40px; border-radius: var(--ds-radius-full); border: 1px solid var(--ds-color-border); background: var(--ds-color-surface); display: grid; place-items: center; cursor: pointer; }
+.pasv-book__title { margin: 0; font-size: var(--ds-text-title-size); font-weight: 700; }
+.pasv-book__scroll { flex: 1; overflow-y: auto; padding: var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-4); }
+.pasv-book__search { position: relative; }
+.pasv-book__search .ds-control-wrap { background: var(--ds-color-surface); }
+.pasv-book__spinner { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+
+.pasv-book__section-title { margin: 0; font-size: var(--ds-text-label-size); font-weight: 700; color: var(--ds-color-text-muted); text-transform: uppercase; letter-spacing: .4px; display: flex; align-items: center; justify-content: space-between; }
+.pasv-book__clear { font-size: var(--ds-text-caption-sm-size); font-weight: 700; color: var(--ds-color-primary); background: none; border: 0; cursor: pointer; }
+
+/* Suggestion list */
+.pasv-book__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-1); }
+.pasv-book__row { display: flex; align-items: center; gap: var(--ds-space-3); width: 100%; text-align: left; padding: var(--ds-space-3); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); cursor: pointer; border-left: 4px solid transparent; }
+.pasv-book__row:hover, .pasv-book__row.is-active { border-left-color: var(--ds-color-primary); background: var(--ds-color-surface-2); }
+.pasv-book__row__icon { width: 38px; height: 38px; border-radius: var(--ds-radius-md); background: var(--ds-color-surface-2); color: var(--ds-color-text-muted); display: grid; place-items: center; flex: none; }
+.pasv-book__row__body { flex: 1; min-width: 0; }
+.pasv-book__row__title { font-weight: 600; font-size: var(--ds-text-body-size); }
+.pasv-book__row__sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-book__hl { background: rgba(79,70,229,.18); color: var(--ds-color-primary); border-radius: 3px; font-weight: 700; }
+.pasv-book__row__trail { color: var(--ds-color-text-muted); }
+
+/* Shortcuts (current location / home / office / saved) */
+.pasv-book__shortcuts { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ds-space-2); }
+.pasv-book__shortcut { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-1); padding: var(--ds-space-3) var(--ds-space-1); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); cursor: pointer; }
+.pasv-book__shortcut__icon { width: 42px; height: 42px; border-radius: var(--ds-radius-md); display: grid; place-items: center; color: #fff; }
+.pasv-book__shortcut__label { font-size: var(--ds-text-caption-sm-size); font-weight: 600; }
+
+/* Pickup map interaction */
+.pasv-pickup__map { position: relative; height: 280px; border-radius: var(--ds-radius-lg); overflow: hidden; border: 1px solid var(--ds-color-border); background: var(--ds-color-surface-2); touch-action: none; cursor: grab; }
+.pasv-pickup__map:active { cursor: grabbing; }
+.pasv-pickup__pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); z-index: 6; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
+.pasv-pickup__pin-pin { width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--ds-color-danger); display: grid; place-items: center; color: #fff; border: 3px solid #fff; box-shadow: var(--ds-shadow-md); }
+.pasv-pickup__pin-pin > * { transform: rotate(45deg); }
+.pasv-pickup__pin-pulse { position: absolute; top: 22px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--ds-color-success); animation: ds-marker-pulse 1.5s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pasv-pickup__pin-pulse { animation: none; } }
+.pasv-pickup__center-dot { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ds-color-danger); opacity: .35; z-index: 4; }
+.pasv-pickup__coords { position: absolute; left: var(--ds-space-3); bottom: var(--ds-space-3); background: var(--ds-color-surface); color: var(--ds-color-text); font-size: var(--ds-text-caption-sm-size); font-weight: 600; padding: 4px 10px; border-radius: var(--ds-radius-full); box-shadow: var(--ds-shadow-sm); z-index: 7; }
+
+/* Confirm bar */
+.pasv-pickup__confirm { position: sticky; bottom: 0; background: var(--ds-color-surface); border-top: 1px solid var(--ds-color-border); padding: var(--ds-space-3) var(--ds-space-4); display: flex; align-items: center; gap: var(--ds-space-3); }
+.pasv-pickup__confirm-body { flex: 1; min-width: 0; }
+.pasv-pickup__confirm-label { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-pickup__confirm-addr { font-weight: 700; font-size: var(--ds-text-body-size); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Vehicle selection (3B-2C) */
+.pasv-veh__list { display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.pasv-veh { border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); background: var(--ds-color-surface); overflow: hidden; }
+.pasv-veh--active { border-color: var(--ds-color-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-color-primary) 25%, transparent); }
+.pasv-veh__main { display: flex; align-items: center; gap: var(--ds-space-3); width: 100%; text-align: left; padding: var(--ds-space-3) var(--ds-space-4); background: transparent; border: 0; cursor: pointer; }
+.pasv-veh__icon { width: 44px; height: 44px; border-radius: var(--ds-radius-md); display: grid; place-items: center; color: #fff; flex: none; background: var(--ds-color-primary); }
+.pasv-veh__icon[data-tone="info"] { background: var(--ds-color-info); }
+.pasv-veh__icon[data-tone="success"] { background: var(--ds-color-success); }
+.pasv-veh__body { flex: 1; min-width: 0; }
+.pasv-veh__name { display: block; font-weight: 700; font-size: var(--ds-text-body-size); }
+.pasv-veh__meta { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); margin-top: 2px; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); }
+.pasv-veh__meta-item { display: inline-flex; align-items: center; gap: 4px; }
+.pasv-veh__fare { font-weight: 800; font-size: var(--ds-text-body-size); white-space: nowrap; }
+.pasv-veh__details { padding: 0 var(--ds-space-4) var(--ds-space-3); border-top: 1px solid var(--ds-color-border); display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-veh__desc { display: flex; align-items: flex-start; gap: 6px; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); margin: var(--ds-space-2) 0 0; }
+.pasv-veh__specs, .pasv-veh__breakdown { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pasv-veh__specs li { display: flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); }
+.pasv-veh__breakdown li { display: flex; justify-content: space-between; font-size: var(--ds-text-caption-sm-size); }
+.pasv-veh__neg { color: var(--ds-color-success); }
+.pasv-veh__total { display: flex; justify-content: space-between; font-weight: 800; font-size: var(--ds-text-body-sm-size); border-top: 1px dashed var(--ds-color-border); padding-top: var(--ds-space-2); margin-top: var(--ds-space-1); }
+
+/* Dynamic pricing / surge banner */
+.pasv-veh__surge { display: flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); font-weight: 600; padding: var(--ds-space-2) var(--ds-space-3); border-radius: var(--ds-radius-md); }
+.pasv-veh__surge--normal { background: color-mix(in srgb, var(--ds-color-success) 12%, transparent); color: var(--ds-color-success); }
+.pasv-veh__surge--active { background: color-mix(in srgb, var(--ds-color-warning) 18%, transparent); color: var(--ds-color-warning-text, #92400e); }
+
+/* Fare review (3B-2D) */
+.pasv-fare__vehicle { display: flex; align-items: center; gap: var(--ds-space-3); }
+.pasv-fare__vehicle-body { min-width: 0; }
+.pasv-fare__vehicle-name { font-weight: 700; font-size: var(--ds-text-body-size); }
+.pasv-fare__vehicle-meta { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); margin-top: 2px; }
+.pasv-fare__vehicle-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.pasv-fare__breakdown { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-fare__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pasv-fare__list li { display: flex; justify-content: space-between; font-size: var(--ds-text-caption-sm-size); }
+.pasv-fare__label { color: var(--ds-color-text-muted); }
+.pasv-fare__amount { font-weight: 600; }
+.pasv-fare__neg { color: var(--ds-color-success); }
+.pasv-fare__total { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid var(--ds-color-border); padding-top: var(--ds-space-2); margin-top: var(--ds-space-1); }
+.pasv-fare__total-amount { font-weight: 800; font-size: var(--ds-text-title-size); color: var(--ds-color-primary); }
+.pasv-fare__pay { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-fare__pay-row { display: flex; gap: var(--ds-space-2); }
+.pasv-fare__pay-item { display: inline-flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); font-weight: 600; padding: var(--ds-space-2) var(--ds-space-3); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); background: var(--ds-color-surface); }
+.pasv-fare__pay-item--active { border-color: var(--ds-color-primary); background: color-mix(in srgb, var(--ds-color-primary) 10%, transparent); color: var(--ds-color-primary); }
+
+/* Confirmed / stop screen (3B-2D end) */
+.pasv-confirm { text-align: center; padding: var(--ds-space-6) var(--ds-space-4); display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-2); }
+.pasv-confirm__check { width: 64px; height: 64px; border-radius: 50%; background: var(--ds-color-success); color: #fff; display: grid; place-items: center; font-size: 32px; box-shadow: var(--ds-shadow-md); }
+.pasv-confirm__title { margin: 0; font-size: var(--ds-text-title-size); font-weight: 800; }
+.pasv-confirm__sub { margin: 0; font-weight: 700; color: var(--ds-color-primary); }
+.pasv-confirm__note { margin: var(--ds-space-2) 0 0; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); max-width: 320px; }
+
+/* 3B-2E — Fare Breakdown (display only) */
+.pasv-fare2 { display: flex; flex-direction: column; min-height: 100vh; background: var(--ds-color-bg); color: var(--ds-color-text); }
+.pasv-fare2__scroll { flex: 1; overflow-y: auto; padding: var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.pasv-fare2__card { background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); padding: var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-3); box-shadow: var(--ds-shadow-sm); }
+.pasv-fare2__line { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-3); font-size: var(--ds-text-body-sm-size); }
+.pasv-fare2__label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-color-text-muted); }
+.pasv-fare2__amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+.pasv-fare2__amount--neg { color: var(--ds-color-success); }
+.pasv-fare2__total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ds-space-3); border-top: 2px solid var(--ds-color-border); padding-top: var(--ds-space-3); margin-top: var(--ds-space-1); }
+.pasv-fare2__total-label { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.pasv-fare2__total-amount { font-weight: 800; font-size: var(--ds-text-title-size); color: var(--ds-color-primary); font-variant-numeric: tabular-nums; }
+.pasv-fare2__note { margin: 0; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); line-height: 1.5; }
+
+/* Link from Fare Review (3B-2D) → Fare Breakdown (3B-2E) */
+.pasv-fare__breakdown-link { align-self: flex-start; background: none; border: 0; padding: 4px 0; font-size: var(--ds-text-caption-sm-size); font-weight: 700; color: var(--ds-color-primary); cursor: pointer; text-decoration: underline; }
+
+/* 3B-2F — Payment Selection (Promo / Voucher / Method / Fare Summary) */
+.pasv-pay__section { display: flex; flex-direction: column; gap: var(--ds-space-3); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); padding: var(--ds-space-4); box-shadow: var(--ds-shadow-sm); }
+.pasv-pay__loading { padding: var(--ds-space-6); text-align: center; color: var(--ds-color-text-muted); }
+.pasv-pay__promos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-pay__promo { display: flex; align-items: center; gap: var(--ds-space-3); width: 100%; text-align: left; padding: var(--ds-space-3); background: var(--ds-color-bg); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); cursor: pointer; }
+.pasv-pay__promo--active { border-color: var(--ds-color-primary); background: color-mix(in srgb, var(--ds-color-primary) 8%, transparent); }
+.pasv-pay__promo-ico { width: 36px; height: 36px; flex: none; border-radius: var(--ds-radius-md); display: grid; place-items: center; background: color-mix(in srgb, var(--ds-color-primary) 12%, transparent); color: var(--ds-color-primary); }
+.pasv-pay__promo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pasv-pay__promo-title { font-weight: 700; font-size: var(--ds-text-body-sm-size); }
+.pasv-pay__promo-sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-pay__voucher { display: flex; gap: var(--ds-space-2); }
+.pasv-pay__voucher-input { flex: 1; padding: var(--ds-space-3); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); background: var(--ds-color-bg); color: var(--ds-color-text); font-size: var(--ds-text-body-sm-size); }
+.pasv-pay__voucher-msg { margin: 0; font-size: var(--ds-text-caption-sm-size); }
+.pasv-pay__voucher-msg--ok { color: var(--ds-color-success); }
+.pasv-pay__voucher-msg--err { color: var(--ds-color-danger); }
+.pasv-pay__methods { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-pay__method { display: flex; align-items: center; gap: var(--ds-space-3); width: 100%; text-align: left; padding: var(--ds-space-3); background: var(--ds-color-bg); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); cursor: pointer; }
+.pasv-pay__method--active { border-color: var(--ds-color-primary); background: color-mix(in srgb, var(--ds-color-primary) 8%, transparent); }
+.pasv-pay__method-ico { width: 36px; height: 36px; flex: none; border-radius: var(--ds-radius-md); display: grid; place-items: center; background: color-mix(in srgb, var(--ds-color-primary) 12%, transparent); color: var(--ds-color-primary); }
+.pasv-pay__method-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pasv-pay__method-label { font-weight: 700; font-size: var(--ds-text-body-sm-size); }
+.pasv-pay__method-sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-pay__warn { margin: 0; display: flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-warning); }
+.pasv-pay__summary { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-pay__summary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pasv-pay__summary-list li { display: flex; justify-content: space-between; font-size: var(--ds-text-caption-sm-size); }
+
+/* 3B-2G — Booking Review */
+.pasv-br__card { background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); padding: var(--ds-space-3) var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-2); box-shadow: var(--ds-shadow-sm); }
+.pasv-br__row { display: flex; align-items: center; gap: var(--ds-space-3); font-size: var(--ds-text-body-sm-size); }
+.pasv-br__row-ico { width: 24px; flex: none; color: var(--ds-color-primary); display: grid; place-items: center; }
+.pasv-br__row-label { color: var(--ds-color-text-muted); min-width: 96px; }
+.pasv-br__row-value { flex: 1; text-align: right; font-weight: 600; }
+.pasv-br__row-value--bold { font-weight: 800; font-size: var(--ds-text-body-size); color: var(--ds-color-primary); }
+.pasv-br__row-value--ok { color: var(--ds-color-success); }
+.pasv-br__row-value--warn { color: var(--ds-color-warning); }
+.pasv-br__terms { display: flex; align-items: flex-start; gap: var(--ds-space-2); font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); cursor: pointer; }
+.pasv-br__terms input { margin-top: 3px; }
+.pasv-br__error { display: flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-danger); background: color-mix(in srgb, var(--ds-color-danger) 10%, transparent); border: 1px solid color-mix(in srgb, var(--ds-color-danger) 30%, transparent); border-radius: var(--ds-radius-md); padding: var(--ds-space-2) var(--ds-space-3); }
+.pasv-br__center { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ds-space-3); padding: var(--ds-space-6); text-align: center; background: var(--ds-color-bg); }
+.pasv-br__spinner { animation: pasv-spin 1s linear infinite; color: var(--ds-color-primary); }
+.pasv-br__check { width: 64px; height: 64px; border-radius: 50%; background: var(--ds-color-success); color: #fff; display: grid; place-items: center; box-shadow: var(--ds-shadow-md); }
+.pasv-br__title { margin: 0; font-size: var(--ds-text-title-size); font-weight: 800; }
+.pasv-br__sub { margin: 0; color: var(--ds-color-text-muted); }
+.pasv-br__id { margin: 0; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+@keyframes pasv-spin { to { transform: rotate(360deg); } }
+
+/* 3B-2G — Trip Waiting (after success) */
+.pasv-trip { align-items: center; text-align: center; gap: var(--ds-space-4); }
+.pasv-trip__pulse { width: 88px; height: 88px; border-radius: 50%; background: color-mix(in srgb, var(--ds-color-primary) 12%, transparent); display: grid; place-items: center; }
+.pasv-trip__spin { animation: pasv-spin 1s linear infinite; color: var(--ds-color-primary); }
+.pasv-trip__title { margin: 0; font-size: var(--ds-text-title-size); font-weight: 800; }
+.pasv-trip__sub { margin: 0; color: var(--ds-color-text-muted); }
+.pasv-trip__route { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-1); width: 100%; max-width: 280px; margin-top: var(--ds-space-2); }
+.pasv-trip__leg { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.pasv-trip__line { width: 2px; height: 24px; background: var(--ds-color-border); }
+.pasv-trip__cancel { background: none; border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); padding: var(--ds-space-2) var(--ds-space-4); font-size: var(--ds-text-caption-sm-size); font-weight: 700; color: var(--ds-color-danger); cursor: pointer; }

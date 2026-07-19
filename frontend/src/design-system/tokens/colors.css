@@ -1,0 +1,115 @@
+/* ============================================================
+   Design System — Color Tokens
+   ------------------------------------------------------------
+   Two layers:
+   1) Raw brand scales (Primary / Secondary / Neutral)
+   2) Semantic roles (primary, secondary, success, warning,
+      danger, info, surface, background, border, text, ...)
+
+   Theme handling: every semantic + surface token is declared
+   with CSS `light-dark(<light>, <dark>)`. The active color is
+   driven by the `color-scheme` property (see theme/theme.css).
+   - light  -> color-scheme: light
+   - dark   -> color-scheme: dark
+   - system -> color-scheme: light dark (follows OS)
+   This keeps Light / Dark / System support with zero token
+   duplication.
+   ============================================================ */
+
+:root {
+  /* ---- Brand: Primary (Indigo) scale ---- */
+  --ds-primary-50:  #eef2ff;
+  --ds-primary-100: #e0e7ff;
+  --ds-primary-200: #c7d2fe;
+  --ds-primary-300: #a5b4fc;
+  --ds-primary-400: #818cf8;
+  --ds-primary-500: #6366f1;
+  --ds-primary-600: #4f46e5;
+  --ds-primary-700: #4338ca;
+  --ds-primary-800: #3730a3;
+  --ds-primary-900: #312e81;
+
+  /* ---- Brand: Secondary (Cyan) scale ---- */
+  --ds-secondary-50:  #ecfeff;
+  --ds-secondary-100: #cffafe;
+  --ds-secondary-200: #a5f3fc;
+  --ds-secondary-300: #67e8f9;
+  --ds-secondary-400: #22d3ee;
+  --ds-secondary-500: #06b6d4;
+  --ds-secondary-600: #0891b2;
+  --ds-secondary-700: #0e7490;
+  --ds-secondary-800: #155e75;
+  --ds-secondary-900: #164e63;
+
+  /* ---- Neutral scale (slate) ---- */
+  --ds-neutral-0:   #ffffff;
+  --ds-neutral-50:  #f8fafc;
+  --ds-neutral-100: #f1f5f9;
+  --ds-neutral-200: #e2e8f0;
+  --ds-neutral-300: #cbd5e1;
+  --ds-neutral-400: #94a3b8;
+  --ds-neutral-500: #64748b;
+  --ds-neutral-600: #475569;
+  --ds-neutral-700: #334155;
+  --ds-neutral-800: #1e293b;
+  --ds-neutral-900: #0f172a;
+  --ds-neutral-950: #020617;
+
+  /* ---- Semantic: Primary role ---- */
+  --ds-color-primary:          light-dark(var(--ds-primary-600), var(--ds-primary-400));
+  --ds-color-primary-hover:    light-dark(var(--ds-primary-700), var(--ds-primary-300));
+  --ds-color-primary-active:   light-dark(var(--ds-primary-800), var(--ds-primary-200));
+  --ds-color-primary-soft:     light-dark(var(--ds-primary-50),  var(--ds-primary-900));
+  --ds-color-primary-contrast: #ffffff;
+
+  /* ---- Semantic: Secondary role ---- */
+  --ds-color-secondary:          light-dark(var(--ds-secondary-600), var(--ds-secondary-400));
+  --ds-color-secondary-hover:    light-dark(var(--ds-secondary-700), var(--ds-secondary-300));
+  --ds-color-secondary-soft:     light-dark(var(--ds-secondary-50),  var(--ds-secondary-900));
+  --ds-color-secondary-contrast: #ffffff;
+
+  /* ---- Semantic: Success ---- */
+  --ds-color-success:          light-dark(#16a34a, #4ade80);
+  --ds-color-success-hover:    light-dark(#15803d, #86efac);
+  --ds-color-success-soft:     light-dark(#dcfce7, #14532d);
+  --ds-color-success-contrast: #ffffff;
+
+  /* ---- Semantic: Warning ---- */
+  --ds-color-warning:          light-dark(#d97706, #fbbf24);
+  --ds-color-warning-hover:    light-dark(#b45309, #fcd34d);
+  --ds-color-warning-soft:     light-dark(#fef3c7, #78350f);
+  --ds-color-warning-contrast: #ffffff;
+
+  /* ---- Semantic: Danger ---- */
+  --ds-color-danger:          light-dark(#dc2626, #f87171);
+  --ds-color-danger-hover:    light-dark(#b91c1c, #fca5a5);
+  --ds-color-danger-soft:     light-dark(#fee2e2, #7f1d1d);
+  --ds-color-danger-contrast: #ffffff;
+
+  /* ---- Semantic: Info ---- */
+  --ds-color-info:          light-dark(#2563eb, #60a5fa);
+  --ds-color-info-hover:    light-dark(#1d4ed8, #93c5fd);
+  --ds-color-info-soft:     light-dark(#dbeafe, #1e3a8a);
+  --ds-color-info-contrast: #ffffff;
+
+  /* ---- Surface / Background / Border (theme-aware) ---- */
+  --ds-color-bg:        light-dark(#f4f6fb, #0b1020);
+  --ds-color-bg-subtle: light-dark(#eef1f7, #0e1424);
+  --ds-color-surface:     light-dark(#ffffff, #111827);
+  --ds-color-surface-2:   light-dark(#f8fafc, #1b2433);
+  --ds-color-surface-3:   light-dark(#f1f5f9, #243044);
+  --ds-color-border:        light-dark(#e8ecf3, #273244);
+  --ds-color-border-strong: light-dark(#d4dae3, #3a465c);
+
+  /* ---- Text (theme-aware) ---- */
+  --ds-color-text:         light-dark(#1f2937, #e5e7eb);
+  --ds-color-text-strong:  light-dark(#0f172a, #f8fafc);
+  --ds-color-text-muted:   light-dark(#7c8794, #94a3b8);
+  --ds-color-text-subtle:  light-dark(#5b6573, #64748b);
+
+  /* ---- Focus ring ---- */
+  --ds-color-focus: light-dark(var(--ds-primary-600), var(--ds-primary-400));
+
+  /* ---- Overlay scrim (modals / drawers) ---- */
+  --ds-color-overlay: light-dark(rgba(15, 23, 42, .45), rgba(0, 0, 0, .6));
+}

@@ -1,0 +1,146 @@
+/* ============================================================
+   Passenger App — Trip screens (3C)
+   Waiting Driver (3A), Driver Assigned (3B target), shared.
+   Reuses --ds-* tokens. Large touch targets; reduced-motion safe.
+   ============================================================ */
+
+.pasv-trip--waiting, .pasv-trip--assigned {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ds-color-bg);
+}
+
+.pasv-trip__bar {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-color-surface);
+  border-bottom: 1px solid var(--ds-color-border);
+}
+.pasv-trip__status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-primary); font-weight: 600;
+}
+.pasv-trip__title { margin: 0; font-size: var(--ds-text-title-size); font-weight: 800; }
+
+.pasv-wait, .pasv-assigned { padding: var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-4); }
+
+.pasv-wait__panel {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  background: var(--ds-color-surface); border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-sm);
+}
+.pasv-wait__panel--danger { border-color: color-mix(in srgb, var(--ds-color-danger) 35%, transparent); }
+
+.pasv-wait__pulse {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: color-mix(in srgb, var(--ds-color-primary) 12%, transparent);
+  display: grid; place-items: center; color: var(--ds-color-primary);
+}
+.pasv-trip__spin { animation: pasv-spin 1s linear infinite; }
+.pasv-wait__lead { margin: 0; font-size: var(--ds-text-body-size); font-weight: 700; }
+.pasv-wait__body { margin: 0; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); }
+.pasv-wait__eta { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-color-text-muted); margin: 0; }
+.pasv-wait__eta strong { color: var(--ds-color-text); font-variant-numeric: tabular-nums; }
+
+.pasv-wait__progress {
+  width: 100%; max-width: 320px; height: 8px; border-radius: 999px;
+  background: var(--ds-color-surface-2); overflow: hidden;
+}
+.pasv-wait__progress-bar {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--ds-color-primary), color-mix(in srgb, var(--ds-color-primary) 60%, #fff));
+  transition: width 1s linear;
+}
+.pasv-wait__retry-note { display: inline-flex; align-items: center; gap: 6px; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-warning); margin: 0; }
+.pasv-wait__actions { display: flex; gap: var(--ds-space-2); flex-wrap: wrap; justify-content: center; }
+
+/* Large touch targets for primary actions */
+.pasv-wait__cancel, .pasv-trip__cancel {
+  min-height: 48px; padding: 0 var(--ds-space-5);
+  border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface); color: var(--ds-color-danger);
+  font-size: var(--ds-text-body-sm-size); font-weight: 700; cursor: pointer;
+}
+.pasv-wait__cancel:active:not(:disabled), .pasv-trip__cancel:active:not(:disabled) { transform: scale(0.98); }
+.pasv-wait__cancel:disabled { opacity: 0.6; cursor: default; }
+
+.pasv-wait__route, .pasv-assigned__card { /* reuse trip route leg styles below */ }
+
+/* Driver Assigned (3B target) */
+.pasv-assigned__card { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-3); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-sm); }
+.pasv-assigned__avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--ds-color-primary); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: var(--ds-text-body-size); }
+.pasv-assigned__info { min-width: 0; }
+.pasv-assigned__name { font-weight: 800; }
+.pasv-assigned__veh { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-assigned__rating { display: inline-flex; align-items: center; gap: 4px; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-warning); font-weight: 600; }
+.pasv-assigned__sep { color: var(--ds-color-text-muted); margin: 0 2px; }
+.pasv-assigned__lead { margin: 0; color: var(--ds-color-text-muted); }
+
+.pasv-assigned__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-3); }
+.pasv-assigned__act { min-height: 48px; justify-content: center; }
+
+.pasv-assigned__cancelled { text-align: center; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-sm-size); }
+.pasv-assigned__cancelled--err { color: var(--ds-color-danger); }
+
+/* Driver Arriving (3C-3C) */
+.pasv-inprogress { gap: var(--ds-space-3); }
+.pasv-trip__statusbar {
+  display: flex; align-items: center;
+  padding: var(--ds-space-2) var(--ds-space-4);
+  background: var(--ds-color-surface);
+  border-bottom: 1px solid var(--ds-color-border);
+}
+.pasv-inprogress__actions { display: flex; gap: var(--ds-space-2); margin-left: auto; }
+.pasv-ico-btn {
+  width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; border: 1px solid var(--ds-color-border);
+  background: var(--ds-color-surface); color: var(--ds-color-primary); cursor: pointer;
+}
+.pasv-ico-btn:hover { background: var(--ds-color-surface-2); }
+.pasv-inprogress__proglbl { margin: 6px 2px 0; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.pasv-inprogress__cta { display: flex; gap: var(--ds-space-3); flex-wrap: wrap; }
+.pasv-inprogress__cta .ds-btn { flex: 1 1 160px; justify-content: center; min-height: 48px; }
+.pasv-inprogress__share { margin: 0; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); word-break: break-all; }
+.pasv-inprogress__share a { color: var(--ds-color-primary); }
+.pasv-arriving__stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-3); }
+.pasv-arriving__stat {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: var(--ds-space-3); background: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md);
+  color: var(--ds-color-primary);
+}
+.pasv-arriving__stat-val { font-size: var(--ds-text-title-size); font-weight: 800; color: var(--ds-color-text); font-variant-numeric: tabular-nums; }
+.pasv-arriving__stat-lbl { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-arriving__progress {
+  width: 100%; height: 10px; border-radius: 999px;
+  background: var(--ds-color-surface-2); overflow: hidden;
+}
+.pasv-arriving__progress-bar {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--ds-color-primary), color-mix(in srgb, var(--ds-color-primary) 60%, #fff));
+  transition: width 1s linear;
+}
+
+.pasv-arriving__remind {
+  display: flex; align-items: center; gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: color-mix(in srgb, var(--ds-color-success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-color-success) 35%, transparent);
+  border-radius: var(--ds-radius-md); color: var(--ds-color-success);
+}
+.pasv-arriving__remind-title { margin: 0; font-weight: 700; font-size: var(--ds-text-body-sm-size); }
+.pasv-arriving__remind-sub { margin: 0; font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); font-variant-numeric: tabular-nums; }
+
+.pasv-arriving__confirm { min-height: 50px; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pasv-arriving__progress-bar { transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pasv-trip__spin { animation: none; }
+  .pasv-wait__progress-bar { transition: none; }
+}

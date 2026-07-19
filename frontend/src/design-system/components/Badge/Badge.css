@@ -1,0 +1,12 @@
+.ds-badge {
+  display: inline-flex; align-items: center; gap: var(--ds-space-1);
+  padding: var(--ds-space-1) var(--ds-space-3);
+  border-radius: var(--ds-radius-full);
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 1.4;
+  color: var(--ds-badge-color);
+  background: color-mix(in srgb, var(--ds-badge-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-badge-color) 28%, transparent);
+}
+.ds-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }

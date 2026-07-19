@@ -1,0 +1,2 @@
+.ds-vlist { border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); background: var(--ds-color-surface); }
+.ds-vlist > div > div { will-change: transform; }

@@ -1,0 +1,27 @@
+/* ============================================================
+   Design System — Theme Controller
+   ------------------------------------------------------------
+   Selects the active color-scheme. All semantic color tokens
+   use CSS `light-dark()` so switching color-scheme is enough
+   to retheme the entire app — no token duplication.
+
+   Modes (set on <html>):
+     light  -> :root[data-theme="light"]
+     dark   -> :root[data-theme="dark"]
+     system -> :root[data-theme="system"] (follows OS)
+
+   Fallback when no attribute is set = light.
+   ============================================================ */
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* system = light dark: honors prefers-color-scheme */
+:root[data-theme='system'] {
+  color-scheme: light dark;
+}

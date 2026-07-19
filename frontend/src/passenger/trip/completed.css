@@ -1,0 +1,62 @@
+/* Trip Completed (3C-3G) + Receipt (3C-3H) */
+.pasv-done { display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: var(--ds-color-surface-2); padding: var(--ds-space-6) var(--ds-space-4); text-align: center; }
+.pasv-done__anim { display: flex; align-items: center; justify-content: center; margin: var(--ds-space-4) 0; color: var(--ds-color-success); }
+.pasv-done__check { animation: pasv-done-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+@keyframes pasv-done-pop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+.pasv-done__title { font-size: var(--ds-text-title-size); font-weight: 800; margin: 0; }
+.pasv-done__sub { color: var(--ds-color-text-muted); font-size: var(--ds-text-body-sm-size); margin: var(--ds-space-2) 0 var(--ds-space-4); }
+
+.pasv-done__body { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: var(--ds-space-4); text-align: left; }
+
+.pasv-done__summary { background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-lg); padding: var(--ds-space-4); }
+.pasv-done__fare { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-bottom: var(--ds-space-3); border-bottom: 1px dashed var(--ds-color-border); }
+.pasv-done__fare-lbl { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.pasv-done__fare-val { font-size: var(--ds-text-display-size, 28px); font-weight: 800; color: var(--ds-color-text); font-variant-numeric: tabular-nums; }
+.pasv-done__pay { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-size: var(--ds-text-caption-sm-size); padding: 2px 10px; border-radius: 999px; }
+.pasv-done__pay.is-paid { color: var(--ds-color-success); background: color-mix(in srgb, var(--ds-color-success) 14%, transparent); }
+.pasv-done__pay.is-pending { color: var(--ds-color-warning); background: color-mix(in srgb, var(--ds-color-warning) 14%, transparent); }
+.pasv-done__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ds-space-2); padding-top: var(--ds-space-3); }
+.pasv-done__stat { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ds-color-primary); }
+.pasv-done__stat span:first-of-type { font-weight: 700; font-size: var(--ds-text-body-size); color: var(--ds-color-text); font-variant-numeric: tabular-nums; }
+.pasv-done__stat-lbl { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-done__rate { background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); padding: var(--ds-space-4); display: flex; flex-direction: column; gap: var(--ds-space-2); align-items: center; }
+.pasv-done__rate-lbl { font-size: var(--ds-text-body-sm-size); font-weight: 600; }
+.pasv-done__stars { display: flex; gap: var(--ds-space-2); }
+.pasv-done__star { background: none; border: none; cursor: pointer; color: var(--ds-color-border); padding: 4px; transition: color 120ms; }
+.pasv-done__star.is-on { color: var(--ds-color-warning); }
+.pasv-done__star:disabled { cursor: default; }
+.pasv-done__rate-ok { display: inline-flex; align-items: center; gap: 4px; color: var(--ds-color-success); font-size: var(--ds-text-caption-sm-size); }
+
+.pasv-done__cta .ds-btn { width: 100%; min-height: 50px; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pasv-done__check { animation: none; }
+}
+
+/* Trip Receipt (3C-3H) */
+.pasv-receipt { display: flex; flex-direction: column; min-height: 100vh; background: var(--ds-color-surface-2); }
+.pasv-receipt__bar { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-color-surface); border-bottom: 1px solid var(--ds-color-border); }
+.pasv-receipt__title { font-weight: 800; font-size: var(--ds-text-body-size); }
+.pasv-receipt__body { display: flex; flex-direction: column; gap: var(--ds-space-4); padding: var(--ds-space-4); }
+
+.pasv-receipt__invoice { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-4); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); }
+.pasv-receipt__invoice-ico { color: var(--ds-color-primary); }
+.pasv-receipt__invoice-no { font-weight: 800; font-size: var(--ds-text-body-size); font-variant-numeric: tabular-nums; }
+.pasv-receipt__invoice-date { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-receipt__card { display: flex; flex-direction: column; gap: var(--ds-space-3); padding: var(--ds-space-4); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); }
+.pasv-receipt__card-head { display: flex; align-items: center; gap: var(--ds-space-2); font-weight: 700; color: var(--ds-color-primary); }
+.pasv-receipt__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ds-space-2); }
+.pasv-receipt__stat { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ds-color-primary); }
+.pasv-receipt__stat span:first-of-type { font-weight: 700; font-size: var(--ds-text-body-size); color: var(--ds-color-text); font-variant-numeric: tabular-nums; }
+.pasv-receipt__stat-lbl { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-receipt__promo { display: flex; align-items: center; gap: var(--ds-space-2); flex-wrap: wrap; }
+.pasv-receipt__promo-title { font-weight: 600; font-size: var(--ds-text-body-sm-size); }
+.pasv-receipt__promo-amt { margin-left: auto; font-weight: 800; color: var(--ds-color-success); font-variant-numeric: tabular-nums; }
+.pasv-receipt__loading { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-receipt__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-3); }
+.pasv-receipt__repeat { width: 100%; min-height: 50px; justify-content: center; margin-top: var(--ds-space-2); }
+

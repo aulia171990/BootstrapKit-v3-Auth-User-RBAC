@@ -1,0 +1,11 @@
+/* ============================================================
+   Design System — Radius Tokens
+   ============================================================ */
+
+:root {
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 16px;
+  --ds-radius-xl: 24px;
+  --ds-radius-full: 9999px;
+}

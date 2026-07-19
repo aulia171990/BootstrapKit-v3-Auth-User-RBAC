@@ -1,0 +1,9 @@
+.ds-responsive-nav { height: 100%; }
+.ds-responsive-nav__toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent; color: var(--ds-color-text); cursor: pointer;
+  padding: var(--ds-space-2); border-radius: var(--ds-radius-md);
+}
+.ds-responsive-nav__toggle:hover { background: var(--ds-color-surface-2); }
+/* On mobile, hide the inline sidebar and show the hamburger via JS state.
+   The toggle itself is only rendered in mobile mode (see component logic). */

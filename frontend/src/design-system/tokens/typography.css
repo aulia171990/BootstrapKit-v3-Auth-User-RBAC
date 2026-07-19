@@ -1,0 +1,128 @@
+/* ============================================================
+   Design System — Typography Tokens
+   ------------------------------------------------------------
+   - Font families & weights
+   - Responsive type scale via clamp() (fluid between
+     mobile and desktop viewport widths)
+   - Utility classes (.ds-type-*) for direct usage
+   Scale roles:
+     display | heading | title | subtitle
+     body | body-sm | caption | label | overline
+   ============================================================ */
+
+:root {
+  /* Font families */
+  --ds-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ds-font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+
+  /* Font weights */
+  --ds-font-weight-regular: 400;
+  --ds-font-weight-medium: 500;
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold: 700;
+
+  /* Display */
+  --ds-text-display-size: clamp(2.5rem, 1.8rem + 3vw, 3.5rem);
+  --ds-text-display-weight: 700;
+  --ds-text-display-line: 1.1;
+  --ds-text-display-track: -0.02em;
+
+  /* Heading (H1) */
+  --ds-text-heading-size: clamp(2rem, 1.5rem + 2vw, 2.5rem);
+  --ds-text-heading-weight: 700;
+  --ds-text-heading-line: 1.15;
+  --ds-text-heading-track: -0.02em;
+
+  /* Title (H2) */
+  --ds-text-title-size: clamp(1.5rem, 1.2rem + 1.2vw, 1.875rem);
+  --ds-text-title-weight: 600;
+  --ds-text-title-line: 1.25;
+  --ds-text-title-track: -0.01em;
+
+  /* Subtitle (H3) */
+  --ds-text-subtitle-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --ds-text-subtitle-weight: 600;
+  --ds-text-subtitle-line: 1.3;
+  --ds-text-subtitle-track: -0.01em;
+
+  /* Body */
+  --ds-text-body-size: 1rem;
+  --ds-text-body-line: 1.6;
+  --ds-text-body-weight: 400;
+
+  /* Body small */
+  --ds-text-body-sm-size: 0.875rem;
+  --ds-text-body-sm-line: 1.5;
+
+  /* Caption */
+  --ds-text-caption-size: 0.8125rem;
+  --ds-text-caption-line: 1.4;
+
+  /* Label */
+  --ds-text-label-size: 0.875rem;
+  --ds-text-label-weight: 600;
+  --ds-text-label-line: 1.3;
+
+  /* Overline / eyebrow */
+  --ds-text-overline-size: 0.75rem;
+  --ds-text-overline-weight: 600;
+  --ds-text-overline-line: 1.2;
+  --ds-text-overline-track: 0.08em;
+}
+
+/* ---------- Utility classes ---------- */
+.ds-type-display {
+  font-size: var(--ds-text-display-size);
+  font-weight: var(--ds-text-display-weight);
+  line-height: var(--ds-text-display-line);
+  letter-spacing: var(--ds-text-display-track);
+  margin: 0;
+}
+.ds-type-heading {
+  font-size: var(--ds-text-heading-size);
+  font-weight: var(--ds-text-heading-weight);
+  line-height: var(--ds-text-heading-line);
+  letter-spacing: var(--ds-text-heading-track);
+  margin: 0;
+}
+.ds-type-title {
+  font-size: var(--ds-text-title-size);
+  font-weight: var(--ds-text-title-weight);
+  line-height: var(--ds-text-title-line);
+  letter-spacing: var(--ds-text-title-track);
+  margin: 0;
+}
+.ds-type-subtitle {
+  font-size: var(--ds-text-subtitle-size);
+  font-weight: var(--ds-text-subtitle-weight);
+  line-height: var(--ds-text-subtitle-line);
+  letter-spacing: var(--ds-text-subtitle-track);
+  margin: 0;
+}
+.ds-type-body {
+  font-size: var(--ds-text-body-size);
+  font-weight: var(--ds-text-body-weight);
+  line-height: var(--ds-text-body-line);
+}
+.ds-type-body-sm {
+  font-size: var(--ds-text-body-sm-size);
+  line-height: var(--ds-text-body-sm-line);
+}
+.ds-type-caption {
+  font-size: var(--ds-text-caption-size);
+  line-height: var(--ds-text-caption-line);
+  color: var(--ds-color-text-muted);
+}
+.ds-type-label {
+  font-size: var(--ds-text-label-size);
+  font-weight: var(--ds-text-label-weight);
+  line-height: var(--ds-text-label-line);
+}
+.ds-type-overline {
+  font-size: var(--ds-text-overline-size);
+  font-weight: var(--ds-text-overline-weight);
+  line-height: var(--ds-text-overline-line);
+  letter-spacing: var(--ds-text-overline-track);
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}

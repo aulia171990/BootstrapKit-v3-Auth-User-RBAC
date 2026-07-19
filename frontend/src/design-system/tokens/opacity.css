@@ -1,0 +1,17 @@
+/* ============================================================
+   Design System — Opacity Tokens
+   ============================================================ */
+
+:root {
+  --ds-opacity-0:   0;
+  --ds-opacity-5:   0.05;
+  --ds-opacity-10:  0.1;
+  --ds-opacity-20:  0.2;
+  --ds-opacity-40:  0.4;
+  --ds-opacity-50:  0.5;
+  --ds-opacity-60:  0.6;
+  --ds-opacity-70:  0.7;
+  --ds-opacity-80:  0.8;
+  --ds-opacity-90:  0.9;
+  --ds-opacity-100: 1;
+}

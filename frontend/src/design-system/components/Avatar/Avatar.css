@@ -1,0 +1,14 @@
+.ds-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: var(--ds-font-weight-semibold);
+  overflow: hidden; flex-shrink: 0; line-height: 1; position: relative;
+}
+.ds-avatar__img { width: 100%; height: 100%; object-fit: cover; }
+.ds-avatar__status {
+  position: absolute; right: 0; bottom: 0; width: 28%; height: 28%;
+  min-width: 8px; min-height: 8px; border-radius: 50%;
+  border: 2px solid var(--ds-color-surface);
+}
+.ds-avatar__badge {
+  position: absolute; top: 0; right: 0; transform: translate(35%, -35%);
+}

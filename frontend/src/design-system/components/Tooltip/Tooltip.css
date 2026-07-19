@@ -1,0 +1,34 @@
+.ds-tooltip { position: relative; display: inline-flex; }
+.ds-tooltip__bubble {
+  position: absolute;
+  z-index: var(--ds-z-tooltip);
+  background: var(--ds-color-text-strong);
+  color: var(--ds-color-surface);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--ds-font-weight-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity var(--ds-duration-fast) var(--ds-ease-standard),
+              transform var(--ds-duration-fast) var(--ds-ease-standard);
+  box-shadow: var(--ds-shadow-md);
+}
+/* Placements */
+.ds-tooltip--top .ds-tooltip__bubble    { bottom: 100%; left: 50%; margin-bottom: var(--ds-space-2); transform-origin: bottom center; translate: -50% 0; }
+.ds-tooltip--bottom .ds-tooltip__bubble { top: 100%; left: 50%; margin-top: var(--ds-space-2); transform-origin: top center; translate: -50% 0; }
+.ds-tooltip--left .ds-tooltip__bubble   { right: 100%; top: 50%; margin-right: var(--ds-space-2); transform-origin: right center; translate: 0 -50%; }
+.ds-tooltip--right .ds-tooltip__bubble  { left: 100%; top: 50%; margin-left: var(--ds-space-2); transform-origin: left center; translate: 0 -50%; }
+
+/* Show on hover/focus of the trigger */
+.ds-tooltip:hover .ds-tooltip__bubble,
+.ds-tooltip:focus-within .ds-tooltip__bubble {
+  opacity: 1;
+  transform: scale(1);
+}
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ds-tooltip__bubble { transition: opacity var(--ds-duration-fast) linear; transform: none; }
+}

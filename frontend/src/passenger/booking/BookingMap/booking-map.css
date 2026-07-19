@@ -1,0 +1,83 @@
+/* ============================================================
+   Passenger App — Booking Map interaction (3B-2C)
+   Scoped under .pasv-bmap-* so it never collides with Admin/Home.
+   Reuses Design System --ds-* tokens; markers/polyline use _maps.css.
+   ============================================================ */
+.pasv-bmap { position: relative; width: 100%; display: flex; flex-direction: column; gap: var(--ds-space-3); }
+
+/* The map canvas (draggable / scrollable). */
+.pasv-bmap__canvas {
+  position: relative;
+  height: 320px;
+  border-radius: var(--ds-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--ds-color-border);
+  background:
+    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ds-color-primary) 8%, transparent), transparent 60%),
+    var(--ds-color-surface-2);
+  touch-action: none; /* enable custom gestures */
+  cursor: grab;
+  user-select: none;
+}
+.pasv-bmap__canvas:active { cursor: grabbing; }
+.pasv-bmap__canvas:focus-visible { outline: 3px solid color-mix(in srgb, var(--ds-color-primary) 40%, transparent); outline-offset: 2px; }
+
+/* Camera animation: smooth translate of the inner layer when recentering. */
+.pasv-bmap__layer {
+  position: absolute; inset: -12%;
+  transition: transform var(--ds-motion-duration-lg) var(--ds-motion-easing-emphasized);
+  will-change: transform;
+}
+.pasv-bmap__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--ds-color-text-muted) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ds-color-text-muted) 10%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Zoom indicator */
+.pasv-bmap__zoom { position: absolute; z-index: 11; bottom: var(--ds-space-3); right: var(--ds-space-3); }
+.pasv-bmap__zoomlevel { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); padding: 2px 6px; background: var(--ds-color-surface); border-radius: var(--ds-radius-sm); box-shadow: var(--ds-shadow-sm); }
+
+/* Centered labels for pickup/destination on the canvas */
+.pasv-bmap__tag {
+  position: absolute; transform: translate(-50%, -120%);
+  padding: 3px 8px; border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-caption-sm-size); font-weight: 600; white-space: nowrap;
+  background: var(--ds-color-surface); color: var(--ds-color-text); box-shadow: var(--ds-shadow-sm);
+  z-index: 7; pointer-events: none; max-width: 180px; overflow: hidden; text-overflow: ellipsis;
+}
+.pasv-bmap__tag--pickup { color: var(--ds-color-success); }
+.pasv-bmap__tag--dest { color: var(--ds-color-danger); }
+
+/* Bottom sheet content */
+.pasv-bmap__sheet { display: flex; flex-direction: column; gap: var(--ds-space-3); padding: var(--ds-space-2) 0; }
+.pasv-bmap__sheet-row { display: flex; align-items: center; gap: var(--ds-space-3); }
+.pasv-bmap__dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pasv-bmap__dot--pickup { background: var(--ds-color-success); }
+.pasv-bmap__dot--dest { background: var(--ds-color-danger); }
+.pasv-bmap__sheet-body { min-width: 0; }
+.pasv-bmap__sheet-title { font-size: var(--ds-text-body-sm-size); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pasv-bmap__sheet-sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+/* Route preview block */
+.pasv-bmap__route { background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); padding: var(--ds-space-3); }
+
+/* Searching-radius ring (3C-3A) — expanding pulse around pickup */
+.pasv-bmap__ring {
+  position: absolute; left: 18%; top: 78%; transform: translate(-50%, -50%);
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--ds-color-primary) 22%, transparent) 0%, transparent 70%);
+  border: 2px solid color-mix(in srgb, var(--ds-color-primary) 40%, transparent);
+  animation: pasv-ring 2.4s ease-out infinite;
+  pointer-events: none; z-index: 5;
+}
+@keyframes pasv-ring {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pasv-bmap__ring { animation: none; opacity: 0.5; }
+}
+

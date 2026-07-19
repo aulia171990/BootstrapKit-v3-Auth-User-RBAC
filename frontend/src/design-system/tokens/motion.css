@@ -1,0 +1,46 @@
+/* ============================================================
+   Design System — Motion Tokens
+   ------------------------------------------------------------
+   Duration, easing curves, and composite transition presets.
+   ============================================================ */
+
+:root {
+  /* Durations */
+  --ds-duration-instant: 0ms;
+  --ds-duration-fast: 150ms;
+  --ds-duration-base: 200ms;
+  --ds-duration-slow: 300ms;
+  --ds-duration-slower: 500ms;
+
+  /* Easing curves */
+  --ds-ease-linear:     cubic-bezier(0, 0, 1, 1);
+  --ds-ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --ds-ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --ds-ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-ease-standard:   cubic-bezier(0.2, 0, 0, 1);     /* Material standard */
+  --ds-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ds-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ds-ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1); /* subtle bounce */
+
+  /* Composite transition presets */
+  --ds-transition-fast:   all var(--ds-duration-fast) var(--ds-ease-standard);
+  --ds-transition-base:   all var(--ds-duration-base) var(--ds-ease-standard);
+  --ds-transition-slow:   all var(--ds-duration-slow) var(--ds-ease-standard);
+  --ds-transition-colors: background-color var(--ds-duration-base) var(--ds-ease-standard),
+                          border-color var(--ds-duration-base) var(--ds-ease-standard),
+                          color var(--ds-duration-base) var(--ds-ease-standard),
+                          box-shadow var(--ds-duration-base) var(--ds-ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ds-duration-fast: 0ms;
+    --ds-duration-base: 0ms;
+    --ds-duration-slow: 0ms;
+    --ds-duration-slower: 0ms;
+    --ds-transition-fast: none;
+    --ds-transition-base: none;
+    --ds-transition-slow: none;
+    --ds-transition-colors: none;
+  }
+}

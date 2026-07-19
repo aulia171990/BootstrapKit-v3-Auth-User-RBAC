@@ -47,6 +47,10 @@ class PermissionSeeder extends Seeder
             ['code' => 'pricing.calculate','name' => 'Hitung pricing'],
             ['code' => 'pricing.manage',   'name' => 'Kelola pricing'],
             ['code' => 'pricing.audit',    'name' => 'Audit pricing'],
+            // admin dashboard / finance
+            ['code' => 'dashboard.view',   'name' => 'Lihat dashboard admin'],
+            ['code' => 'payment.manage',   'name' => 'Kelola pembayaran'],
+            ['code' => 'customer.manage',  'name' => 'Kelola customer'],
         ];
 
         foreach ($permissions as $p) {
@@ -56,7 +60,7 @@ class PermissionSeeder extends Seeder
         // Wire roles -> permissions so RBAC is functional end-to-end.
         $this->grant('customer', ['order.create', 'order.view.own']);
         $this->grant('driver',   ['driver.location', 'order.accept', 'order.view.own', 'driver.view']);
-        $this->grant('admin',    ['user.manage', 'order.view.all', 'payment.refund', 'order.view.own', 'driver.view', 'driver.create', 'driver.update', 'driver.delete', 'driver.approve', 'driver.reject', 'driver.suspend', 'driver.manage_documents', 'dispatch.view', 'dispatch.retry', 'dispatch.manage', 'dispatch.history', 'pricing.view', 'pricing.calculate', 'pricing.manage', 'pricing.audit']);
+        $this->grant('admin',    ['user.manage', 'order.view.all', 'payment.refund', 'order.view.own', 'driver.view', 'driver.create', 'driver.update', 'driver.delete', 'driver.approve', 'driver.reject', 'driver.suspend', 'driver.manage_documents', 'dispatch.view', 'dispatch.retry', 'dispatch.manage', 'dispatch.history', 'pricing.view', 'pricing.calculate', 'pricing.manage', 'pricing.audit', 'dashboard.view', 'trip.manage', 'payment.manage', 'customer.manage']);
     }
 
     private function grant(string $roleName, array $codes): void

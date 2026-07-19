@@ -1,0 +1,89 @@
+/* Button — enterprise button */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  font-family: inherit;
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: var(--ds-transition-colors), transform var(--ds-duration-fast) var(--ds-ease-standard);
+  text-decoration: none;
+}
+.ds-btn:active:not(:disabled) { transform: translateY(1px); }
+.ds-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.ds-btn:focus-visible { outline: 2px solid var(--ds-color-focus); outline-offset: 2px; }
+
+/* Sizes */
+.ds-btn--xs { padding: var(--ds-space-1) var(--ds-space-2); font-size: 0.75rem; }
+.ds-btn--sm { padding: var(--ds-space-2) var(--ds-space-3); font-size: 0.8125rem; }
+.ds-btn--md { padding: var(--ds-space-3) var(--ds-space-4); font-size: 0.875rem; }
+.ds-btn--lg { padding: var(--ds-space-4) var(--ds-space-6); font-size: 1rem; }
+.ds-btn--xl { padding: var(--ds-space-5) var(--ds-space-8); font-size: 1.125rem; }
+.ds-btn--block { width: 100%; }
+
+/* Circle (icon button) */
+.ds-btn--circle { border-radius: var(--ds-radius-full); padding: 0; aspect-ratio: 1; }
+.ds-btn--circle.ds-btn--xs { width: 28px; height: 28px; }
+.ds-btn--circle.ds-btn--sm { width: 32px; height: 32px; }
+.ds-btn--circle.ds-btn--md { width: 40px; height: 40px; }
+.ds-btn--circle.ds-btn--lg { width: 48px; height: 48px; }
+.ds-btn--circle.ds-btn--xl { width: 56px; height: 56px; }
+
+/* Solid variants */
+.ds-btn--primary { background: var(--ds-color-primary); color: var(--ds-color-primary-contrast); }
+.ds-btn--primary:hover:not(:disabled) { background: var(--ds-color-primary-hover); }
+.ds-btn--secondary { background: var(--ds-color-secondary); color: var(--ds-color-secondary-contrast); }
+.ds-btn--secondary:hover:not(:disabled) { background: var(--ds-color-secondary-hover); }
+.ds-btn--success { background: var(--ds-color-success); color: var(--ds-color-success-contrast); }
+.ds-btn--success:hover:not(:disabled) { background: var(--ds-color-success-hover); }
+.ds-btn--warning { background: var(--ds-color-warning); color: var(--ds-color-warning-contrast); }
+.ds-btn--warning:hover:not(:disabled) { background: var(--ds-color-warning-hover); }
+.ds-btn--danger { background: var(--ds-color-danger); color: var(--ds-color-danger-contrast); }
+.ds-btn--danger:hover:not(:disabled) { background: var(--ds-color-danger-hover); }
+.ds-btn--info { background: var(--ds-color-info); color: var(--ds-color-info-contrast); }
+.ds-btn--info:hover:not(:disabled) { background: var(--ds-color-info-hover); }
+
+/* Ghost (subtle bg) */
+.ds-btn--ghost {
+  background: var(--ds-color-surface-2);
+  color: var(--ds-color-text);
+  border-color: var(--ds-color-border);
+}
+.ds-btn--ghost:hover:not(:disabled) { background: var(--ds-color-surface-3); }
+
+/* Outline */
+.ds-btn--outline {
+  background: transparent;
+  color: var(--ds-color-primary);
+  border-color: var(--ds-color-primary);
+}
+.ds-btn--outline:hover:not(:disabled) { background: var(--ds-color-primary-soft); }
+
+/* Link */
+.ds-btn--link {
+  background: transparent;
+  color: var(--ds-color-primary);
+  padding-inline: 0;
+}
+.ds-btn--link:hover:not(:disabled) { color: var(--ds-color-primary-hover); text-decoration: underline; }
+
+/* Loading ring */
+.ds-btn__spinner { display: inline-flex; }
+.ds-btn__ring {
+  width: 1em; height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ds-btn-spin 0.6s linear infinite;
+}
+@keyframes ds-btn-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ds-btn__ring { animation: none; } }
+
+.ds-btn__icon { flex-shrink: 0; }
+.ds-btn__label { display: inline-block; }

@@ -1,0 +1,99 @@
+/* ============================================================
+   Passenger App — Booking UX primitives (3B-2H)
+   Skeleton shimmer, offline banner, retry, micro-interactions,
+   reduced-motion + responsive guards. Reuses --ds-* tokens.
+   ============================================================ */
+
+/* Offline banner */
+.pasv-offline {
+  display: flex; align-items: center; gap: var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-4);
+  background: color-mix(in srgb, var(--ds-color-warning) 14%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-color-warning) 35%, transparent);
+  color: var(--ds-color-warning);
+  font-size: var(--ds-text-caption-sm-size);
+}
+.pasv-offline__text { flex: 1; min-width: 0; }
+.pasv-offline__retry { flex: none; }
+
+/* Inline error + retry */
+.pasv-inline-err {
+  display: flex; align-items: center; gap: var(--ds-space-2); flex-wrap: wrap;
+  padding: var(--ds-space-3);
+  border: 1px solid color-mix(in srgb, var(--ds-color-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--ds-color-danger) 10%, transparent);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-color-danger);
+  font-size: var(--ds-text-caption-sm-size);
+}
+
+/* Skeleton shimmer (booking-specific sizing on top of ds-skeleton) */
+.pasv-veh--skeleton { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-3); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); }
+.pasv-veh__sk-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.pasv-fare__sk { padding: var(--ds-space-3) 0; display: flex; flex-direction: column; gap: 8px; }
+
+/* ---------- Micro-interactions ---------- */
+.pasv-veh { transition: border-color var(--ds-motion-duration-sm) var(--ds-motion-easing-standard), background var(--ds-motion-duration-sm) var(--ds-motion-easing-standard), transform var(--ds-motion-duration-sm) var(--ds-motion-easing-standard); }
+.pasv-veh:active { transform: scale(0.99); }
+.pasv-veh--active { box-shadow: var(--ds-shadow-sm); }
+.pasv-veh__main:hover { background: var(--ds-color-surface-2); }
+
+.pasv-book__confirm-btn { transition: transform var(--ds-motion-duration-sm) var(--ds-motion-easing-standard), filter var(--ds-motion-duration-sm) var(--ds-motion-easing-standard); }
+.pasv-book__confirm-btn:active:not(:disabled) { transform: translateY(1px) scale(0.995); }
+.pasv-book__confirm-btn:hover:not(:disabled) { filter: brightness(1.03); }
+
+.pasv-pay__promo, .pasv-pay__method, .pasv-fare__pay-item, .pasv-veh__main {
+  transition: border-color var(--ds-motion-duration-sm) var(--ds-motion-easing-standard), background var(--ds-motion-duration-sm) var(--ds-motion-easing-standard);
+}
+
+/* Entrance animation for booking cards/sections */
+@keyframes pasv-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pasv-book__scroll > *, .pasv-fare2__card, .pasv-pay__section, .pasv-br__card, .pasv-veh {
+  animation: pasv-rise var(--ds-motion-duration-lg) var(--ds-motion-easing-emphasized) both;
+}
+.pasv-veh:nth-child(2) { animation-delay: 40ms; }
+.pasv-veh:nth-child(3) { animation-delay: 80ms; }
+.pasv-veh:nth-child(4) { animation-delay: 120ms; }
+
+/* Map canvas loading shimmer overlay */
+.pasv-bmap__loading {
+  position: absolute; inset: 0; z-index: 9;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--ds-color-surface-2) 70%, transparent);
+  backdrop-filter: blur(1px);
+}
+.pasv-bmap__loading .pasv-bmap__loading-bar {
+  width: 60%; height: 8px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--ds-color-surface) 25%, color-mix(in srgb, var(--ds-color-primary) 30%, var(--ds-color-surface)) 50%, var(--ds-color-surface) 75%);
+  background-size: 200% 100%;
+  animation: pasv-shimmer 1.2s ease-in-out infinite;
+}
+@keyframes pasv-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ---------- Accessibility: respect reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pasv-veh, .pasv-book__confirm-btn, .pasv-pay__promo, .pasv-pay__method,
+  .pasv-fare__pay-item, .pasv-veh__main,
+  .pasv-book__scroll > *, .pasv-fare2__card, .pasv-pay__section, .pasv-br__card,
+  .pasv-veh--skeleton, .pasv-bmap__loading .pasv-bmap__loading-bar {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 380px) {
+  .pasv-veh__fare { font-size: var(--ds-text-caption-sm-size); }
+  .pasv-pay__promo-sub { display: none; }
+  .pasv-bmap__canvas { height: 260px; }
+}
+@media (min-width: 600px) {
+  /* On larger phones/tablets, give the map more room. */
+  .pasv-bmap__canvas { height: 360px; }
+}

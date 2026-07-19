@@ -1,0 +1,67 @@
+/* ---------- Map UI system (2G) ---------- */
+/* MapContainer shell (kept here so all map styles live together) */
+.ds-map { position: relative; width: 100%; height: var(--ds-map-h, 360px); border-radius: var(--ds-radius-lg); overflow: hidden; border: 1px solid var(--ds-color-border); background: var(--ds-color-surface-2); }
+.ds-map__placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: var(--ds-space-2); color: var(--ds-color-text-muted); font-size: var(--ds-text-body-sm-size); }
+
+/* Overlays (markers, polylines, pins) are absolutely positioned within .ds-map */
+.ds-map-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.ds-map-overlay > * { pointer-events: auto; }
+
+/* Marker pins */
+.ds-marker { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; z-index: 6; cursor: default; }
+.ds-marker__pin { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: grid; place-items: center; color: #fff; border: 2px solid #fff; box-shadow: var(--ds-shadow-md); }
+.ds-marker__pin > * { transform: rotate(45deg); }
+.ds-marker__label { margin-top: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600; background: var(--ds-color-surface); color: var(--ds-color-text); border-radius: var(--ds-radius-sm); box-shadow: var(--ds-shadow-sm); white-space: nowrap; }
+.ds-marker--driver .ds-marker__pin { background: var(--ds-color-primary); }
+.ds-marker--customer .ds-marker__pin { background: var(--ds-color-secondary); }
+.ds-marker--tone-success .ds-marker__pin { background: var(--ds-color-success); }
+.ds-marker--tone-warning .ds-marker__pin { background: var(--ds-color-warning); }
+.ds-marker--tone-danger .ds-marker__pin { background: var(--ds-color-danger); }
+.ds-marker--tone-info .ds-marker__pin { background: var(--ds-color-info); }
+.ds-marker--active { z-index: 8; }
+.ds-marker--active .ds-marker__pin { outline: 3px solid color-mix(in srgb, var(--ds-color-primary) 35%, transparent); }
+
+/* Pulse for current/active */
+.ds-marker__pulse { position: absolute; top: 18px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--ds-color-success); animation: ds-marker-pulse 1.5s ease-out infinite; }
+@keyframes ds-marker-pulse { 0% { transform: scale(0.6); opacity: 0.8; } 100% { transform: scale(2.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ds-marker__pulse { animation: none; } }
+
+/* SVG overlay layer (polyline, heat) */
+.ds-map-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; overflow: visible; }
+
+/* Heatmap interface */
+.ds-heat { position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: multiply; opacity: 0.7; }
+
+/* Location pins list / picker */
+.ds-locpin { display: flex; align-items: center; gap: var(--ds-space-2); padding: var(--ds-space-2); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); background: var(--ds-color-surface); cursor: pointer; width: 100%; text-align: left; }
+.ds-locpin:hover { border-color: var(--ds-color-primary); }
+.ds-locpin--active { border-color: var(--ds-color-primary); background: var(--ds-color-surface-2); }
+.ds-locpin__icon { color: var(--ds-color-danger); display: grid; place-items: center; }
+.ds-locpin__body { flex: 1; min-width: 0; }
+.ds-locpin__title { font-size: var(--ds-text-body-sm-size); font-weight: 600; }
+.ds-locpin__sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.ds-locpicker { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.ds-locpicker__results { max-height: 220px; overflow: auto; display: flex; flex-direction: column; gap: var(--ds-space-1); }
+
+/* Controls */
+.ds-map-ctrl { position: absolute; z-index: 10; display: flex; flex-direction: column; gap: var(--ds-space-1); }
+.ds-map-ctrl--tl { top: var(--ds-space-3); left: var(--ds-space-3); }
+.ds-map-ctrl--tr { top: var(--ds-space-3); right: var(--ds-space-3); }
+.ds-map-ctrl--bl { bottom: var(--ds-space-3); left: var(--ds-space-3); }
+.ds-map-ctrl--br { bottom: var(--ds-space-3); right: var(--ds-space-3); }
+.ds-map-button { width: 38px; height: 38px; border-radius: var(--ds-radius-md); border: 1px solid var(--ds-color-border); background: var(--ds-color-surface); color: var(--ds-color-text); display: grid; place-items: center; cursor: pointer; box-shadow: var(--ds-shadow-sm); transition: background var(--ds-motion-duration-fast) var(--ds-motion-easing-standard); }
+.ds-map-button:hover { background: var(--ds-color-surface-2); }
+.ds-map-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.ds-map-button--active { background: var(--ds-color-primary); color: #fff; border-color: var(--ds-color-primary); }
+
+/* Floating controls container (groups multiple controls) */
+.ds-map-floating { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+
+/* Route preview */
+.ds-route { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.ds-route__head { display: flex; align-items: center; justify-content: space-between; }
+.ds-route__title { font-size: var(--ds-text-body-size); font-weight: 600; }
+.ds-route__summary { display: flex; gap: var(--ds-space-4); flex-wrap: wrap; }
+.ds-route__stat { display: flex; flex-direction: column; }
+.ds-route__stat-label { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+.ds-route__stat-value { font-size: var(--ds-text-title-size); font-weight: 700; }

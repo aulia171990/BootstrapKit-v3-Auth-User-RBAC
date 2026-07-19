@@ -1,0 +1,7 @@
+.ds-adt { display: flex; flex-direction: column; gap: var(--ds-space-3); }
+.ds-adt__toolbar { display: flex; align-items: center; gap: var(--ds-space-2); flex-wrap: wrap; }
+.ds-adt__pager { display: flex; align-items: center; gap: var(--ds-space-3); font-size: var(--ds-text-body-sm-size); color: var(--ds-color-text-muted); }
+.ds-adt__count { font-size: var(--ds-text-body-sm-size); color: var(--ds-color-primary); }
+.ds-adt__sort { display: inline-flex; align-items: center; gap: var(--ds-space-1); cursor: pointer; user-select: none; }
+.ds-adt__sort:focus-visible { outline: 2px solid var(--ds-color-primary); outline-offset: 2px; border-radius: var(--ds-radius-sm); }
+.ds-adt__sort-icon { display: inline-flex; color: var(--ds-color-text-muted); }

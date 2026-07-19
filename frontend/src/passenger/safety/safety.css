@@ -1,0 +1,50 @@
+/* Safety Center (3C-3F) */
+.pasv-safety { display: flex; flex-direction: column; min-height: 100vh; background: var(--ds-color-surface-2); }
+.pasv-safety__bar {
+  display: flex; align-items: center; gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-color-surface); border-bottom: 1px solid var(--ds-color-border);
+}
+.pasv-safety__title { font-weight: 800; font-size: var(--ds-text-body-size); }
+.pasv-safety__body { display: flex; flex-direction: column; gap: var(--ds-space-4); padding: var(--ds-space-4); }
+
+/* SOS */
+.pasv-safety__sos { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-2); padding: var(--ds-space-5) 0; }
+.pasv-safety__sos-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  width: 132px; height: 132px; border-radius: 999px; cursor: pointer;
+  background: var(--ds-color-danger); color: #fff; border: none;
+  font-weight: 800; font-size: var(--ds-text-body-sm-size);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ds-color-danger) 40%, transparent);
+}
+.pasv-safety__sos-btn:hover { filter: brightness(1.05); }
+.pasv-safety__hint { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); text-align: center; max-width: 280px; }
+
+/* Rows & cards */
+.pasv-safety__row {
+  display: flex; align-items: center; gap: var(--ds-space-3); width: 100%;
+  padding: var(--ds-space-3) var(--ds-space-4); cursor: pointer; text-align: left;
+  background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); color: var(--ds-color-text);
+}
+.pasv-safety__row-ico { color: var(--ds-color-danger); }
+.pasv-safety__row-main { display: flex; flex-direction: column; flex: 1; line-height: 1.25; }
+.pasv-safety__row-title { font-weight: 700; font-size: var(--ds-text-body-sm-size); }
+.pasv-safety__row-sub { font-size: var(--ds-text-caption-sm-size); color: var(--ds-color-text-muted); }
+
+.pasv-safety__card { display: flex; flex-direction: column; gap: var(--ds-space-3); padding: var(--ds-space-4); background: var(--ds-color-surface); border: 1px solid var(--ds-color-border); border-radius: var(--ds-radius-md); }
+.pasv-safety__card-head { display: flex; align-items: center; gap: var(--ds-space-2); font-weight: 700; color: var(--ds-color-primary); }
+.pasv-safety__code { font-size: var(--ds-text-title-size); font-weight: 800; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+.pasv-safety__contacts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-safety__contact { display: flex; align-items: center; gap: var(--ds-space-3); }
+.pasv-safety__tips { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-2); }
+.pasv-safety__tips li { display: flex; gap: var(--ds-space-2); align-items: flex-start; font-size: var(--ds-text-body-sm-size); color: var(--ds-color-text); }
+.pasv-safety__tips li svg { color: var(--ds-color-success); margin-top: 3px; flex: none; }
+
+/* Dialog actions */
+.pasv-safety__dialog-actions { display: flex; gap: var(--ds-space-3); justify-content: flex-end; margin-top: var(--ds-space-4); }
+.pasv-safety__dialog-actions .ds-btn { min-height: 44px; }
+.pasv-safety__sos-ok { display: flex; align-items: center; gap: var(--ds-space-2); color: var(--ds-color-success); font-weight: 600; }
+
+.pasv-assigned__act--safety { color: var(--ds-color-danger); border-color: color-mix(in srgb, var(--ds-color-danger) 40%, var(--ds-color-border)); }
+.pasv-ico-btn--safe { color: var(--ds-color-danger); }
+.pasv-ico-btn--safe:hover { background: color-mix(in srgb, var(--ds-color-danger) 12%, var(--ds-color-surface)); }

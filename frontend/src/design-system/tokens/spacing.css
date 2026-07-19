@@ -1,0 +1,23 @@
+/* ============================================================
+   Design System — Spacing Tokens
+   ------------------------------------------------------------
+   4px base unit. Scale: 4, 8, 12, 16, 20, 24, 32, 40,
+   48, 64, 80, 96.
+   Usage: padding: var(--ds-space-4);
+   ============================================================ */
+
+:root {
+  --ds-space-0:  0;
+  --ds-space-1:  4px;   /* xs  */
+  --ds-space-2:  8px;   /* sm  */
+  --ds-space-3:  12px;  /* md  */
+  --ds-space-4:  16px;  /* base */
+  --ds-space-5:  20px;  /* lg  */
+  --ds-space-6:  24px;  /* xl  */
+  --ds-space-8:  32px;  /* 2xl */
+  --ds-space-10: 40px;  /* 3xl */
+  --ds-space-12: 48px;  /* 4xl */
+  --ds-space-16: 64px;  /* 5xl */
+  --ds-space-20: 80px;  /* 6xl */
+  --ds-space-24: 96px;  /* 7xl */
+}

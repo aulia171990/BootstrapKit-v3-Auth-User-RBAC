@@ -6,7 +6,12 @@ export const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
 async function req(path, opts = {}) {
-  const headers = { Accept: 'application/json', ...(opts.headers || {}) };
+  const token = getToken();
+  const headers = {
+    Accept: 'application/json',
+    ...(token ? { Authorization: 'Bearer ' + token } : {}),
+    ...(opts.headers || {}),
+  };
   if (opts.body && !(opts.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
@@ -29,6 +34,12 @@ export const api = {
   me: () => req('/auth/me'),
   orders: () => req('/orders'),
   order: (id) => req('/orders/' + id),
+  drivers: () => req('/drivers'),
+  driver: (id) => req('/drivers/' + id),
+  dashboardStats: () => req('/admin/dashboard/stats'),
+  payments: () => req('/admin/payments'),
+  trips: () => req('/admin/trips'),
+  customers: () => req('/admin/customers'),
   createOrder: (p) => req('/orders', { method: 'POST', body: JSON.stringify(p) }),
   acceptOrder: (id) => req('/orders/' + id + '/accept', { method: 'POST' }),
   updateStatus: (id, status) => req('/orders/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),

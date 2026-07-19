@@ -1,0 +1,19 @@
+/* ============================================================
+   Design System — Z-Index Tokens
+   ------------------------------------------------------------
+   Centralized stacking order to avoid conflicts across the
+   four apps (Passenger / Driver / Admin / Ops Control).
+   ============================================================ */
+
+:root {
+  --ds-z-hide:    -1;
+  --ds-z-base:    0;
+  --ds-z-raised:  10;   /* sticky header, navbar */
+  --ds-z-dropdown: 1000;
+  --ds-z-sticky:  1100;
+  --ds-z-overlay: 1200; /* modal scrim */
+  --ds-z-modal:   1300; /* dialog */
+  --ds-z-popover: 1400;
+  --ds-z-toast:   1500; /* toasts / notifications */
+  --ds-z-tooltip: 1600;
+}

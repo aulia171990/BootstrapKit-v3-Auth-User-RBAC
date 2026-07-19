@@ -1,0 +1,28 @@
+/* ============================================================
+   Design System — Elevation / Shadow Tokens
+   ------------------------------------------------------------
+   Elevation levels: xs, sm, md, lg, xl.
+   Shadow color is theme-aware (soft in light, deep in dark).
+   ============================================================ */
+
+:root {
+  --ds-shadow-color: light-dark(rgba(16, 24, 40, .12), rgba(0, 0, 0, .55));
+
+  --ds-shadow-xs: 0 1px 2px var(--ds-shadow-color);
+
+  --ds-shadow-sm:
+    0 1px 3px var(--ds-shadow-color),
+    0 1px 2px var(--ds-shadow-color);
+
+  --ds-shadow-md:
+    0 4px 6px -1px var(--ds-shadow-color),
+    0 2px 4px -2px var(--ds-shadow-color);
+
+  --ds-shadow-lg:
+    0 10px 15px -3px var(--ds-shadow-color),
+    0 4px 6px -4px var(--ds-shadow-color);
+
+  --ds-shadow-xl:
+    0 20px 25px -5px var(--ds-shadow-color),
+    0 8px 10px -6px var(--ds-shadow-color);
+}

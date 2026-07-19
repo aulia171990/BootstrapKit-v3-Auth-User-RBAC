@@ -11,6 +11,6 @@ class CustomerManagementService
 
     public function paginated(int $perPage = 20)
     {
-        return $this->users->allForRole('customer')->paginate($perPage);
+        return $this->users->allForRole('customer', $perPage);
     }
 }

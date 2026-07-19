@@ -1,0 +1,10 @@
+.ds-tree, .ds-tree__children { list-style: none; margin: 0; padding: 0; }
+.ds-tree__row { display: flex; align-items: center; gap: var(--ds-space-2); padding: var(--ds-space-1) var(--ds-space-2); border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-color-text); font-size: var(--ds-text-body-sm-size); outline: none; }
+.ds-tree__row:hover:not(.is-disabled) { background: var(--ds-color-surface-2); }
+.ds-tree__row.is-selected { background: var(--ds-color-primary-soft); color: var(--ds-color-primary-hover); font-weight: var(--ds-font-weight-semibold); }
+.ds-tree__row.is-disabled { opacity: .5; cursor: not-allowed; }
+.ds-tree__row:focus-visible { box-shadow: 0 0 0 2px var(--ds-color-primary); }
+.ds-tree__caret { display: inline-flex; width: 16px; color: var(--ds-color-text-muted); transition: transform var(--ds-duration-fast) var(--ds-ease-standard); }
+.ds-tree__caret.is-open { transform: rotate(90deg); }
+.ds-tree__icon { display: inline-flex; color: inherit; }
+.ds-tree__label { flex: 1; }

@@ -1,0 +1,10 @@
+.ds-spinner { display: inline-flex; }
+.ds-spinner__ring {
+  width: 100%; height: 100%;
+  border: 2px solid var(--ds-color-primary-soft);
+  border-top-color: var(--ds-color-primary);
+  border-radius: 50%;
+  animation: ds-spinner-rot 0.7s linear infinite;
+}
+@keyframes ds-spinner-rot { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ds-spinner__ring { animation: none; } }

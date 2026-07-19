@@ -1,0 +1,32 @@
+.ds-card {
+  background: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-card-pad, var(--ds-space-6));
+  position: relative;
+}
+.ds-card.is-interactive { cursor: pointer; transition: box-shadow var(--ds-duration-base) var(--ds-ease-standard), transform var(--ds-duration-base) var(--ds-ease-standard), border-color var(--ds-duration-base) var(--ds-ease-standard); }
+.ds-card.is-interactive:hover { box-shadow: var(--ds-shadow-lg); border-color: var(--ds-color-border-strong); transform: translateY(-2px); }
+.ds-card.is-interactive:focus-visible { outline: 2px solid var(--ds-color-focus); outline-offset: 2px; }
+.ds-card[data-elevation='xs'] { box-shadow: var(--ds-shadow-xs); }
+.ds-card[data-elevation='sm'] { box-shadow: var(--ds-shadow-sm); }
+.ds-card[data-elevation='md'] { box-shadow: var(--ds-shadow-md); }
+.ds-card[data-elevation='lg'] { box-shadow: var(--ds-shadow-lg); }
+.ds-card[data-elevation='xl'] { box-shadow: var(--ds-shadow-xl); }
+.ds-card[data-elevation='none'] { box-shadow: none; }
+.ds-card[data-radius='sm'] { border-radius: var(--ds-radius-sm); }
+.ds-card[data-radius='md'] { border-radius: var(--ds-radius-md); }
+.ds-card[data-radius='lg'] { border-radius: var(--ds-radius-lg); }
+.ds-card[data-radius='xl'] { border-radius: var(--ds-radius-xl); }
+
+/* Sub-components (assume no outer padding when using full Card) */
+.ds-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-space-3); padding: var(--ds-space-5) var(--ds-space-6); border-bottom: 1px solid var(--ds-color-border); }
+.ds-card__heading { display: flex; align-items: center; gap: var(--ds-space-3); }
+.ds-card__title { font-size: var(--ds-text-title-size); font-weight: var(--ds-font-weight-semibold); color: var(--ds-color-text-strong); }
+.ds-card__subtitle { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.ds-card__actions { display: flex; align-items: center; gap: var(--ds-space-2); }
+.ds-card__content { color: var(--ds-color-text); }
+.ds-card__footer { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-4) var(--ds-space-6); border-top: 1px solid var(--ds-color-border); }
+
+/* Loading overlay */
+.ds-card__loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--ds-color-surface) 70%, transparent); border-radius: inherit; }

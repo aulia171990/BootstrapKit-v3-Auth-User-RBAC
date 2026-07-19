@@ -1,0 +1,30 @@
+/* ============================================================
+   Design System — Breakpoint Tokens
+   ------------------------------------------------------------
+   Mobile-first. Values exposed as CSS variables for use in
+   container queries / JS media logic.
+     mobile  < 640
+     tablet  >= 640
+     laptop  >= 1024
+     desktop >= 1280
+     wide    >= 1536
+   ============================================================ */
+
+:root {
+  --ds-bp-mobile:  0;
+  --ds-bp-tablet:  640px;
+  --ds-bp-laptop:  1024px;
+  --ds-bp-desktop: 1280px;
+  --ds-bp-wide:    1536px;
+}
+
+/* Convenience: center container with responsive max-width */
+.ds-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--ds-space-4);
+}
+@media (min-width: 640px)  { .ds-container { max-width: 640px;  } }
+@media (min-width: 1024px) { .ds-container { max-width: 1024px; } }
+@media (min-width: 1280px) { .ds-container { max-width: 1280px; } }
+@media (min-width: 1536px) { .ds-container { max-width: 1536px; } }

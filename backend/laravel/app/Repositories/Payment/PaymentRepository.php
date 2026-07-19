@@ -15,4 +15,9 @@ class PaymentRepository
     {
         return PaymentTransaction::where('reference', $reference)->first();
     }
+
+    public function paginate(int $perPage = 20)
+    {
+        return PaymentTransaction::orderByDesc('created_at')->paginate($perPage);
+    }
 }

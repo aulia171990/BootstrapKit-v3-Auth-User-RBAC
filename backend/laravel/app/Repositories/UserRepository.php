@@ -55,4 +55,20 @@ class UserRepository
     {
         $user->save();
     }
+
+    /**
+     * Paginated users that have the given role (e.g. 'customer').
+     */
+    public function allForRole(string $roleName, int $perPage = 20)
+    {
+        $role = Role::where('name', $roleName)->first();
+        if (! $role) {
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage);
+        }
+        return User::join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->where('role_user.role_id', $role->id)
+            ->orderByDesc('users.created_at')
+            ->select('users.*')
+            ->paginate($perPage);
+    }
 }
