@@ -9,3 +9,9 @@ if (typeof global.ResizeObserver === 'undefined') {
     disconnect() {}
   };
 }
+
+// jsdom lacks URL.createObjectURL; provide a no-op so receipt export can run.
+if (typeof global.URL !== 'undefined' && typeof global.URL.createObjectURL === 'undefined') {
+  global.URL.createObjectURL = () => 'blob:mock';
+  global.URL.revokeObjectURL = () => {};
+}

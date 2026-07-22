@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import BottomNavigation from '../design-system/components/BottomNavigation/index.js';
-import { Home, Clock, Wallet, Bell, User, ChevronLeft, MapPin } from 'lucide-react';
+import { Home, Clock, Wallet, Bell, User, ChevronLeft, MapPin, Send, CreditCard, History, Tag } from 'lucide-react';
 import PassengerHome from './PassengerHome.jsx';
 import DestinationSearch from './booking/DestinationSearch.jsx';
 import PickupSelection from './booking/PickupSelection.jsx';
@@ -15,10 +15,29 @@ import DriverArriving from './trip/DriverArriving.jsx';
 import TripInProgress from './trip/TripInProgress.jsx';
 import TripCompleted from './trip/TripCompleted.jsx';
 import Receipt from './trip/Receipt.jsx';
+import { WalletHome, TransactionHistory, TopUp, PaymentMethods, Promo, WalletSecurity } from './wallet/index.js';
+import ActivityHome from './activity/ActivityHome.jsx';
+import TripHistory from './activity/TripHistory.jsx';
+import TripDetail from './activity/TripDetail.jsx';
+import ActivityReceipt from './activity/ActivityReceipt.jsx';
+import RepeatBooking from './activity/RepeatBooking.jsx';
+import RefundSupport from './activity/RefundSupport.jsx';
+import NotificationInbox from './activity/NotificationInbox.jsx';
+import NotificationDetail from './activity/NotificationDetail.jsx';
+import NotificationPreferences from './activity/NotificationPreferences.jsx';
 import { ChatScreen, VoiceCall } from './communication/index.js';
 import { SafetyCenter } from './safety/index.js';
 import BookingMap from './booking/BookingMap/index.js';
 import { EmptyState } from '../design-system/index.js';
+import ProfileHome from './profile/ProfileHome.jsx';
+import PersonalInformation from './profile/PersonalInformation.jsx';
+import SavedAddresses from './profile/SavedAddresses.jsx';
+import EmergencyContacts from './profile/EmergencyContacts.jsx';
+import ProfilePaymentMethods from './profile/PaymentMethods.jsx';
+import Preferences from './profile/Preferences.jsx';
+import SecurityCenter from './profile/SecurityCenter.jsx';
+import LanguageTheme from './profile/LanguageTheme.jsx';
+import AccountManagement from './profile/AccountManagement.jsx';
 
 /**
  * PassengerApp — tenant shell for the Passenger App.
@@ -39,6 +58,12 @@ import { EmptyState } from '../design-system/index.js';
  *   { kind: 'tripInProgress', booking, driver } → 3C-3D Trip In Progress (auto-nav from 3C)
  *   { kind: 'tripCompleted', booking, driver } → 3C-3G Trip Completed (auto-nav from 3D)
  *   { kind: 'receipt', booking, driver }        → 3C-3H Receipt (nav from 3G)
+ *   { kind: 'walletSub', title, icon, text }     → 4A wallet sub-screen placeholder (nav from Wallet Home)
+ *   { kind: 'history' }                           → 4B Transaction History (nav from Wallet Home)
+ *   { kind: 'topup' }                             → 4C Top Up (nav from Wallet Home)
+ *   { kind: 'payment' }                            → 4D Payment Methods (nav from Wallet Home)
+ *   { kind: 'promo' }                              → 4E Promo & Voucher (nav from Wallet Home)
+ *   { kind: 'security' }                           → 4F Wallet Security (nav from Wallet Home)
  */
 export default function PassengerApp({ user, onLogout }) {
   const [view, setView] = useState({ kind: 'tab', id: 'home' });
@@ -52,6 +77,20 @@ export default function PassengerApp({ user, onLogout }) {
   ];
 
   const goTab = (id) => setView({ kind: 'tab', id });
+
+  const profileRoute = (id) => {
+    const map = {
+      personalInfo: 'profilePersonalInfo', addresses: 'profileAddresses', emergency: 'profileEmergency',
+      payments: 'profilePaymentMethods', preferences: 'profilePreferences', security: 'profileSecurity',
+      password: 'profileSecurity', twoFactor: 'profileSecurity', devices: 'profileSecurity',
+      loginHistory: 'profileSecurity', language: 'profileLanguage', theme: 'profileLanguage',
+      accessibility: 'profileLanguage', notifications: 'profilePreferences', help: 'profileAccount',
+      account: 'profileAccount', privacy: 'profileAccount', terms: 'profileAccount', about: 'profileAccount',
+    };
+    const kind = map[id] || id;
+    if (kind.startsWith('profile')) setView({ kind });
+    else goTab('profile');
+  };
 
   const goHome = (to) => {
     if (typeof to === 'string' && to.startsWith('booking:')) { setView({ kind: 'destination' }); return; }
@@ -233,6 +272,49 @@ export default function PassengerApp({ user, onLogout }) {
         />
       )}
 
+      {view.kind === 'walletSub' && (
+        <TabPlaceholder title={view.title} icon={view.icon} text={view.text} />
+      )}
+
+      {view.kind === 'history' && (
+        <TransactionHistory
+          onBack={() => setView({ kind: 'tab', id: 'wallet' })}
+          onNext={() => setView({ kind: 'payment' })}
+          onExportReceipt={() => {}}
+        />
+      )}
+
+      {view.kind === 'topup' && (
+        <TopUp
+          onBack={() => setView({ kind: 'tab', id: 'wallet' })}
+          onDone={() => setView({ kind: 'payment' })}
+          onExportReceipt={() => {}}
+        />
+      )}
+
+      {view.kind === 'payment' && (
+        <PaymentMethods
+          onBack={() => setView({ kind: 'tab', id: 'wallet' })}
+          onNext={() => setView({ kind: 'promo' })}
+          onAdd={() => {}}
+          onChanged={() => {}}
+        />
+      )}
+
+      {view.kind === 'promo' && (
+        <Promo
+          onBack={() => setView({ kind: 'tab', id: 'wallet' })}
+          onNext={() => setView({ kind: 'security' })}
+          onChanged={() => {}}
+        />
+      )}
+
+      {view.kind === 'security' && (
+        <WalletSecurity
+          onBack={() => setView({ kind: 'tab', id: 'wallet' })}
+        />
+      )}
+
       {view.kind === 'tab' && view.id === 'home' && (
         <PassengerHome
           user={user}
@@ -243,10 +325,166 @@ export default function PassengerApp({ user, onLogout }) {
           onNotifications={(sub) => goTab(sub === 'profile' ? 'profile' : 'notifications')}
         />
       )}
-      {view.kind === 'tab' && view.id === 'activity' && <TabPlaceholder title="Aktivitas" icon={Clock} text="Riwayat perjalanan akan tampil di sini." />}
-      {view.kind === 'tab' && view.id === 'wallet' && <TabPlaceholder title="Dompet" icon={Wallet} text="Saldo, top up, dan riwayat transaksi." />}
-      {view.kind === 'tab' && view.id === 'notifications' && <TabPlaceholder title="Notifikasi" icon={Bell} text="Semua notifikasi Anda." />}
-      {view.kind === 'tab' && view.id === 'profile' && <TabPlaceholder title="Profil" icon={User} text={`${user?.name || user?.email || ''}`.trim() || 'Profil penumpang.'} />}
+      {view.kind === 'tab' && view.id === 'activity' && (
+        <ActivityHome
+          onTripDetail={(t) => setView({ kind: 'history', selected: t })}
+          onOngoingTrip={() => goTab('activity')}
+          onPaymentDetail={() => goTab('wallet')}
+          onFavoriteTrip={(f) => setView({ kind: 'repeat', prefill: f })}
+          onViewAllTrips={() => setView({ kind: 'history' })}
+          onViewAllPayments={() => setView({ kind: 'history' })}
+          onFilter={() => setView({ kind: 'history' })}
+          onSearch={() => setView({ kind: 'history' })}
+          onRefundSupport={() => setView({ kind: 'refund' })}
+          onRetry={() => {}}
+        />
+      )}
+      {view.kind === 'history' && (
+        <TripHistory
+          onBack={() => goTab('activity')}
+          onTripDetail={(t) => setView({ kind: 'detail', selected: t })}
+          onFavoriteTrip={(f) => setView({ kind: 'repeat', prefill: f })}
+          onReceipt={(t) => setView({ kind: 'receipt', tripId: t?.id })}
+          onRepeat={(t) => setView({ kind: 'repeat', trip: t })}
+          onSort={() => {}}
+          onRetry={() => {}}
+        />
+      )}
+      {view.kind === 'detail' && (
+        <TripDetail
+          trip={view.selected}
+          onBack={() => setView({ kind: 'history' })}
+          onRepeatBooking={(t) => setView({ kind: 'repeat', trip: t })}
+          onSupport={(t, mode) => setView({ kind: 'refund', trip: t })}
+          onReceipt={(t) => setView({ kind: 'receipt', tripId: t?.id })}
+          onShare={(t) => setView({ kind: 'receipt', tripId: t?.id })}
+          onRate={(id, value) => {}}
+          onRetry={() => {}}
+        />
+      )}
+      {view.kind === 'receipt' && (
+        <ActivityReceipt
+          tripId={view.tripId}
+          onBack={() => setView({ kind: 'detail', selected: { id: view.tripId } })}
+          onDownload={() => {}}
+          onShare={() => {}}
+          onEmail={() => {}}
+        />
+      )}
+      {view.kind === 'repeat' && (
+        <RepeatBooking
+          trip={view.trip}
+          prefill={view.prefill}
+          onBack={() => view.trip ? setView({ kind: 'detail', selected: view.trip }) : setView({ kind: 'history' })}
+          onProceed={(sel) => setView({ kind: 'vehicle', dest: sel.destination, pickup: sel.pickup, vehicle: sel.vehicle, fare: sel.fare, route: sel.route, surge: sel.surge })}
+        />
+      )}
+      {view.kind === 'refund' && (
+        <RefundSupport
+          trip={view.trip}
+          onBack={() => view.trip ? setView({ kind: 'detail', selected: view.trip }) : goTab('activity')}
+          onContactSupport={(t, mode) => setView({ kind: 'support', trip: t, mode })}
+          onDispute={(t) => { papi.submitTripDispute(t?.id, { reason: 'Sengketa perjalanan', detail: '' }).then(() => setView({ kind: 'refund', trip: t })); }}
+          onHelpArticle={() => {}}
+        />
+      )}
+      {view.kind === 'support' && (
+        <ChatScreen
+          booking={{ id: 'support' }}
+          driver={{ name: 'Customer Support', vehicle: 'Layanan Pelanggan', photo: null }}
+          onClose={() => view.trip ? setView({ kind: 'refund', trip: view.trip }) : goTab('activity')}
+          onCall={() => {}}
+        />
+      )}
+      {view.kind === 'tab' && view.id === 'wallet' && (
+        <WalletHome
+          onTopUp={() => setView({ kind: 'topup' })}
+          onTransfer={() => setView({ kind: 'walletSub', title: 'Transfer', icon: Send, text: 'Kirim saldo ke pengguna lain (segera hadir).' })}
+          onPaymentMethods={() => setView({ kind: 'payment' })}
+          onHistory={() => setView({ kind: 'history' })}
+          onSecurity={() => setView({ kind: 'security' })}
+          onPromo={() => setView({ kind: 'promo' })}
+          onRefresh={() => {}}
+          onRetry={() => {}}
+          onPickPayment={(sel) => setView({ kind: 'topup', prefill: sel })}
+        />
+      )}
+      {view.kind === 'tab' && view.id === 'notifications' && (
+        <NotificationInbox
+          onOpen={(n) => setView({ kind: 'notificationDetail', notification: n })}
+          onPreferences={() => setView({ kind: 'notificationPreferences' })}
+        />
+      )}
+      {view.kind === 'notificationPreferences' && (
+        <NotificationPreferences
+          onBack={() => setView({ kind: 'tab', id: 'notifications' })}
+        />
+      )}
+      {view.kind === 'notificationDetail' && (
+        <NotificationDetail
+          notification={view.notification}
+          onBack={() => setView({ kind: 'tab', id: 'notifications' })}
+          onOpenRelated={(n) => {
+            const d = n?.data || {};
+            if (d.type === 'trip' && d.id) setView({ kind: 'detail', selected: { id: d.id } });
+            else if (d.type === 'promotion' && d.id) setView({ kind: 'promo' });
+            else if (d.type === 'wallet' || d.type === 'payment') setView({ kind: 'wallet' });
+            else if (d.type === 'support' || d.type === 'refund') setView({ kind: 'refund', trip: d.id ? { id: d.id } : undefined });
+            else if (d.type === 'chat') setView({ kind: 'chat', booking: d.id ? { id: d.id } : undefined });
+            else setView({ kind: 'tab', id: 'notifications' });
+          }}
+          onShare={() => {}}
+        />
+      )}
+      {view.kind === 'tab' && view.id === 'profile' && (
+        <ProfileHome
+          user={user}
+          onNavigate={profileRoute}
+          onLogout={onLogout}
+        />
+      )}
+      {view.kind === 'profilePersonalInfo' && (
+        <PersonalInformation
+          user={user}
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profileAddresses' && (
+        <SavedAddresses
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profileEmergency' && (
+        <EmergencyContacts
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profilePaymentMethods' && (
+        <ProfilePaymentMethods
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profilePreferences' && (
+        <Preferences
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profileSecurity' && (
+        <SecurityCenter
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profileLanguage' && (
+        <LanguageTheme
+          onBack={() => goTab('profile')}
+        />
+      )}
+      {view.kind === 'profileAccount' && (
+        <AccountManagement
+          onBack={() => goTab('profile')}
+          onLogout={onLogout}
+        />
+      )}
 
       <BottomNavigation
         items={tabs.map((t) => ({ ...t, active: view.kind === 'tab' && view.id === t.id, onClick: () => goTab(t.id) }))}

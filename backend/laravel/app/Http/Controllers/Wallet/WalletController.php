@@ -26,8 +26,8 @@ class WalletController extends Controller
     public function balance(BalanceRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
@@ -40,8 +40,8 @@ class WalletController extends Controller
     public function ledger(LedgerRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
@@ -54,8 +54,8 @@ class WalletController extends Controller
     public function topup(TopupRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
@@ -75,8 +75,8 @@ class WalletController extends Controller
     public function withdraw(WithdrawRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
@@ -98,15 +98,15 @@ class WalletController extends Controller
         $request->validate();
 
         $from = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
 
         $to = $this->wallets->getOrCreate(
-            (string) $request->input('to_owner_id', $request->user()->id),
             'User',
+            (string) $request->input('to_owner_id', $request->user()->id),
             'customer',
             'IDR',
         );
@@ -129,8 +129,8 @@ class WalletController extends Controller
     public function refund(RefundRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );
@@ -150,8 +150,8 @@ class WalletController extends Controller
     public function history(HistoryRequest $request): JsonResponse
     {
         $wallet = $this->wallets->getOrCreate(
-            (string) $request->user()->id,
             'User',
+            (string) $request->user()->id,
             'customer',
             'IDR',
         );

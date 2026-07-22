@@ -41,6 +41,11 @@ class PromotionService
         return $promotion;
     }
 
+    public function paginateActive(int $perPage = 20): \Illuminate\Contracts\Pagination\Paginator
+    {
+        return $this->promotions->paginateActive($perPage);
+    }
+
     public function find(string $id): ?Promotion
     {
         $cache = $this->cache;

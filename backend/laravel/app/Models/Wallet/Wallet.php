@@ -5,12 +5,11 @@ namespace App\Models\Wallet;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Wallet extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'owner_type',

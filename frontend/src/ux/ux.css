@@ -1,0 +1,183 @@
+/* ============================================================
+   Global UX Layer — CSS
+   ------------------------------------------------------------
+   Shared utilities, safe area insets, animation helpers,
+   accessibility overrides.
+   ============================================================ */
+
+/* ── Safe Area Insets ──────────────────────────────────────── */
+:root {
+  --ds-safe-area-top: env(safe-area-inset-top, 0px);
+  --ds-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --ds-safe-area-left: env(safe-area-inset-left, 0px);
+  --ds-safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+/* ── Animation Utility Classes ─────────────────────────────── */
+.ds-anim-fade {
+  animation: ds-ux-fade var(--ds-duration-base, 200ms) var(--ds-ease-standard, ease) both;
+}
+.ds-anim-slide-up {
+  animation: ds-ux-slide-up var(--ds-duration-base, 200ms) var(--ds-ease-decelerate, ease-out) both;
+}
+.ds-anim-slide-down {
+  animation: ds-ux-slide-down var(--ds-duration-base, 200ms) var(--ds-ease-decelerate, ease-out) both;
+}
+.ds-anim-slide-left {
+  animation: ds-ux-slide-left var(--ds-duration-base, 200ms) var(--ds-ease-standard, ease) both;
+}
+.ds-anim-slide-right {
+  animation: ds-ux-slide-right var(--ds-duration-base, 200ms) var(--ds-ease-standard, ease) both;
+}
+.ds-anim-scale {
+  animation: ds-ux-scale var(--ds-duration-base, 200ms) var(--ds-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+.ds-anim-pop {
+  animation: ds-ux-pop var(--ds-duration-base, 200ms) var(--ds-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+.ds-anim-slide-fade-up {
+  animation: ds-ux-slide-fade-up var(--ds-duration-base, 200ms) var(--ds-ease-standard, ease) both;
+}
+
+@keyframes ds-ux-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ds-ux-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ds-ux-slide-down { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ds-ux-slide-left { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes ds-ux-slide-right { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes ds-ux-scale { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes ds-ux-pop { from { opacity: 0; transform: scale(0.9) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes ds-ux-slide-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Staggered animation delay helpers */
+.ds-stagger-1 { animation-delay: 50ms; }
+.ds-stagger-2 { animation-delay: 100ms; }
+.ds-stagger-3 { animation-delay: 150ms; }
+.ds-stagger-4 { animation-delay: 200ms; }
+.ds-stagger-5 { animation-delay: 250ms; }
+.ds-stagger-6 { animation-delay: 300ms; }
+.ds-stagger-7 { animation-delay: 350ms; }
+.ds-stagger-8 { animation-delay: 400ms; }
+
+/* ── Pull to Refresh ───────────────────────────────────────── */
+.ds-pull-to-refresh {
+  overflow: hidden; position: relative;
+}
+.ds-pull-to-refresh__indicator {
+  display: flex; align-items: center; justify-content: center;
+  height: 0; overflow: hidden; transition: height 200ms ease;
+  color: var(--ds-color-text-muted); font-size: 13px; gap: 8px;
+}
+.ds-pull-to-refresh__indicator.is-visible {
+  height: 48px;
+}
+.ds-pull-to-refresh__spinner {
+  animation: ds-spinner-rot 800ms linear infinite;
+}
+
+/* ── Haptic visual feedback (for non-haptic devices) ──────── */
+.ds-haptic {
+  transition: transform 100ms ease;
+}
+.ds-haptic:active {
+  transform: scale(0.97);
+}
+
+/* ── Keyboard avoidance helper ─────────────────────────────── */
+.ds-keyboard-avoid {
+  transition: padding-bottom 200ms ease;
+}
+
+/* ── Focus ring globally ───────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--ds-color-primary, #4f46e5);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Selection color ───────────────────────────────────────── */
+::selection {
+  background: var(--ds-color-primary-soft, #eef2ff);
+  color: var(--ds-color-primary-hover, #4338ca);
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────── */
+.ds-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.ds-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.ds-scrollbar::-webkit-scrollbar-thumb { background: var(--ds-color-surface-3); border-radius: 3px; }
+.ds-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--ds-color-text-muted); }
+
+/* ── Reduced Motion (global override) ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ds-anim-fade,
+  .ds-anim-slide-up,
+  .ds-anim-slide-down,
+  .ds-anim-slide-left,
+  .ds-anim-slide-right,
+  .ds-anim-scale,
+  .ds-anim-pop,
+  .ds-anim-slide-fade-up {
+    animation: none;
+  }
+  .ds-pull-to-refresh__indicator { transition: none; }
+  .ds-keyboard-avoid { transition: none; }
+  .ds-haptic:active { transform: none; }
+}
+
+/* ── High Contrast Mode ────────────────────────────────────── */
+[data-theme="high-contrast"] {
+  --ds-color-bg: #000 !important;
+  --ds-color-surface: #111 !important;
+  --ds-color-surface-2: #1a1a1a !important;
+  --ds-color-surface-3: #333 !important;
+  --ds-color-border: #555 !important;
+  --ds-color-text: #fff !important;
+  --ds-color-text-muted: #ccc !important;
+  --ds-color-text-strong: #fff !important;
+  --ds-shadow-sm: none !important;
+  --ds-shadow-md: none !important;
+  --ds-shadow-lg: none !important;
+  --ds-shadow-xl: none !important;
+}
+[data-theme="high-contrast"] img { filter: contrast(1.2); }
+
+/* ── Large Text Mode ────────────────────────────────────────── */
+[data-font-size="large"] {
+  --ds-text-body-size: 18px;
+  --ds-text-body-sm-size: 16px;
+  --ds-text-caption-size: 15px;
+  --ds-text-title-size: 22px;
+  --ds-text-h1-size: 32px;
+  --ds-text-h2-size: 26px;
+  --ds-text-h3-size: 22px;
+}
+
+/* ── Skeleton global loading body class ────────────────────── */
+body.is-loading * {
+  cursor: progress !important;
+}
+
+/* ── Shimmer overlay for containers ────────────────────────── */
+.ds-shimmer-overlay {
+  position: relative; overflow: hidden;
+}
+.ds-shimmer-overlay::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: ds-shimmer-sweep 1.5s ease infinite;
+  pointer-events: none;
+}
+@keyframes ds-shimmer-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-shimmer-overlay::after { animation: none; display: none; }
+}
+
+/* ── Dark mode overrides for shimmer overlay ───────────────── */
+[data-theme="dark"] .ds-shimmer-overlay::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+}

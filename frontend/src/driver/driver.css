@@ -1,0 +1,66 @@
+.drv-app {
+  /* Driver app specific styles */
+}
+
+.drv-home {
+  padding: var(--ds-space-4);
+}
+
+.drv-home .driver-header {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin-bottom: var(--ds-space-4);
+}
+
+.drv-home .online-status-card {
+  margin-bottom: var(--ds-space-4);
+  background-color: var(--ds-color-primary-100); /* Example: light primary background */
+}
+
+.drv-home .online-status-card .status-indicator {
+  margin-left: auto;
+}
+
+.drv-home .today-summary-card {
+  margin-bottom: var(--ds-space-4);
+}
+
+.drv-home .quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--ds-space-3);
+}
+
+.drv-home .quick-actions-grid .action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  background-color: var(--ds-color-surface);
+  color: var(--ds-color-text);
+  font-size: var(--ds-font-size-sm);
+  font-weight: var(--ds-font-weight-medium);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.drv-home .quick-actions-grid .action-button:hover {
+  background-color: var(--ds-color-surface-hover);
+}
+
+.drv-home .quick-actions-grid .action-button .icon {
+  width: 24px;
+  height: 24px;
+  color: var(--ds-color-primary);
+}
+
+.drv-home .bottom-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}

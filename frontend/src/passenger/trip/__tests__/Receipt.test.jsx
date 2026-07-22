@@ -20,9 +20,9 @@ beforeEach(() => {
     invoiceNo: 'INV-BKR1-2026', issuedAt: new Date('2026-07-19T10:00:00').toISOString(),
   });
   papi.shareTrip.mockResolvedValue({ id: 'BKR1', url: 'https://ojol.test/t/rcpt' });
-  // jsdom lacks object URL + anchor download; stub minimally.
-  if (!URL.createObjectURL) URL.createObjectURL = vi.fn(() => 'blob:mock');
-  if (!URL.revokeObjectURL) URL.revokeObjectURL = vi.fn();
+  // jsdom lacks object URL + anchor download; stub minimally (override setup stub).
+  URL.createObjectURL = vi.fn(() => 'blob:mock');
+  URL.revokeObjectURL = vi.fn();
   HTMLAnchorElement.prototype.click = vi.fn();
 });
 

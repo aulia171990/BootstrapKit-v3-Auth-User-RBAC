@@ -8,7 +8,10 @@ class WalletRepository
 {
     public function find(string $ownerType, string $ownerId, string $walletType, string $currency = 'IDR'): ?Wallet
     {
-        return Wallet::where(compact('owner_type', 'owner_id', 'wallet_type', 'currency'))
+        return Wallet::where('owner_type', $ownerType)
+            ->where('owner_id', $ownerId)
+            ->where('wallet_type', $walletType)
+            ->where('currency', $currency)
             ->first();
     }
 

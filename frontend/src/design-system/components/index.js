@@ -141,3 +141,8 @@ export { SplitLayout } from './SplitLayout/index.js';
 export { ResponsiveContainer } from './ResponsiveContainer/index.js';
 export { ResponsiveGrid } from './ResponsiveGrid/index.js';
 export { ResponsiveSidebar } from './ResponsiveSidebar/index.js';
+/* UX Layer (Sprint 8) */
+export { Shimmer } from './Shimmer/index.js';
+export { OfflineBanner } from './OfflineBanner/index.js';
+export { PageTransition } from './PageTransition/index.js';
+export { FloatingActionButton } from './FloatingActionButton/index.js';

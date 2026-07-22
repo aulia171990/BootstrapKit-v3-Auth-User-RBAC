@@ -45,4 +45,30 @@ export const api = {
   updateStatus: (id, status) => req('/orders/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
   updateLocation: (id, p) => req('/orders/' + id + '/location', { method: 'POST', body: JSON.stringify(p) }),
   pay: (id, method) => req('/orders/' + id + '/pay', { method: 'POST', body: JSON.stringify({ method }) }),
+
+  // ── Wallet module ──
+  walletBalance: () => req('/wallet/balance'),
+  walletTransactions: (limit) => req('/wallet/transactions' + (limit ? `?limit=${limit}` : '')),
+  walletTopup: (amount) => req('/wallet/topup', { method: 'POST', body: JSON.stringify({ amount }) }),
+
+  // ── Payment module ──
+  paymentMethods: () => req('/payment/methods'),
+
+  // ── Promotion module ──
+  promotions: () => req('/promotions'),
+
+  // ── Notification module ──
+  notifications: (params = '') => req('/notification/notifications' + (params ? `?${params}` : '')),
+  notificationUnread: () => req('/notification/notifications/unread'),
+  notificationMarkRead: (ids) => req('/notification/notifications/read', { method: 'POST', body: JSON.stringify({ ids }) }),
+  notificationMarkAllRead: () => req('/notification/notifications/read-all', { method: 'POST' }),
+  notificationPreferences: () => req('/notification/preferences'),
+  notificationUpdatePreferences: (prefs) => req('/notification/preferences', { method: 'PUT', body: JSON.stringify(prefs) }),
+
+  // ── Trip / Booking module (passenger activity) ──
+  trips: (params = '') => req('/trips' + (params ? `?${params}` : '')),
+  trip: (id) => req('/trips/' + id),
+  bookingsHistory: (params = '') => req('/bookings/history' + (params ? `?${params}` : '')),
+  bookingTrack: (id) => req('/bookings/' + id + '/track'),
+  orderTrack: (id) => req('/orders/' + id + '/track'),
 };
