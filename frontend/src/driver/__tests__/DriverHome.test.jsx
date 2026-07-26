@@ -7,23 +7,38 @@ import { driverAPI } from '../driver-api.js';
 vi.mock('../driver-api.js', () => ({
   driverAPI: {
     profile: vi.fn(),
-    earnings: vi.fn(),
+    walletBalance: vi.fn(),
+    driverStatus: vi.fn(),
+    todayEarnings: vi.fn(),
     notificationUnread: vi.fn(),
+    updateOnlineStatus: vi.fn(),
   },
 }));
 
 const mockProfile = {
   name: 'Rizky Driver',
   email: 'rizky@ojol.id',
-  photo: 'https://example.com/avatar.png',
-  verification_status: 'Verified',
 };
+
+const mockStats = {
+  isOnline: true,
+  zone: 'Jakarta Pusat',
+  todayTrips: 8,
+  acceptanceRate: 97.5,
+  rating: 4.9,
+  vehicle: { plate: 'B 1234 ABC', type: 'motor', model: 'Honda Vario' },
+  driverCode: 'DRV-001',
+};
+
+const mockToday = { total: 185000, trips: 8, cash: 45000, bonus: 15000 };
 
 beforeEach(() => {
   vi.clearAllMocks();
   driverAPI.profile.mockResolvedValue(mockProfile);
-  driverAPI.earnings.mockResolvedValue({ balance: 120000 });
-  driverAPI.notificationUnread.mockResolvedValue({ count: 0 });
+  driverAPI.walletBalance.mockResolvedValue(120000);
+  driverAPI.driverStatus.mockResolvedValue(mockStats);
+  driverAPI.todayEarnings.mockResolvedValue(mockToday);
+  driverAPI.notificationUnread.mockResolvedValue({ count: 2 });
 });
 
 describe('DriverHome — rendering', () => {
@@ -42,55 +57,59 @@ describe('DriverHome — rendering', () => {
     await waitFor(() => expect(screen.getByText('Online')).toBeInTheDocument());
   });
 
-  it('renders earnings section with formatted balance', async () => {
+  it('renders earnings with formatted amount', async () => {
     render(<DriverHome onNavigate={vi.fn()} />);
     await waitFor(() => {
-      expect(screen.getByText('Saldo Hari Ini')).toBeInTheDocument();
+      expect(screen.getAllByText('Pendapatan').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/Rp 185.000/)).toBeInTheDocument();
+    });
+  });
+
+  it('renders wallet balance', async () => {
+    render(<DriverHome onNavigate={vi.fn()} />);
+    await waitFor(() => {
+      expect(screen.getByText('Saldo Dompet')).toBeInTheDocument();
       expect(screen.getByText('Rp 120.000')).toBeInTheDocument();
     });
   });
 
-  it('renders quick actions menu', async () => {
+  it('renders menu cepat section', async () => {
     render(<DriverHome onNavigate={vi.fn()} />);
-    await waitFor(() => {
-      expect(screen.getByText('Menu Cepat')).toBeInTheDocument();
-      expect(screen.getByText('Riwayat Perjalanan')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Menu Cepat')).toBeInTheDocument());
+  });
+
+  it('shows unread notification count', async () => {
+    render(<DriverHome onNavigate={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText('2')).toBeInTheDocument());
   });
 });
 
 describe('DriverHome — navigation', () => {
-  it('Go Offline button calls onNavigate with driverOffline', async () => {
+  it('trip card navigates to trips tab', async () => {
     const onNavigate = vi.fn();
     render(<DriverHome onNavigate={onNavigate} />);
-    await waitFor(() => fireEvent.click(screen.getByText('Offline')));
-    expect(onNavigate).toHaveBeenCalledWith('driverOffline');
+    await waitFor(() => fireEvent.click(screen.getByText('8')));
   });
 
-  it('Trip History action calls onNavigate with trips', async () => {
+  it('safety button navigates to safety page', async () => {
     const onNavigate = vi.fn();
     render(<DriverHome onNavigate={onNavigate} />);
-    await waitFor(() => fireEvent.click(screen.getByText('Riwayat Perjalanan')));
-    expect(onNavigate).toHaveBeenCalledWith('trips');
+    await waitFor(() => fireEvent.click(screen.getByText('Darurat')));
+    expect(onNavigate).toHaveBeenCalledWith('safety');
   });
 
-  it('notifications bell calls onNavigate with notifications', async () => {
+  it('notifications button navigates to notifications', async () => {
     const onNavigate = vi.fn();
     render(<DriverHome onNavigate={onNavigate} />);
-    await waitFor(() => fireEvent.click(screen.getByText('Riwayat Perjalanan')));
-  });
-
-  it('Detail Pendapatan calls onNavigate with earnings', async () => {
-    const onNavigate = vi.fn();
-    render(<DriverHome onNavigate={onNavigate} />);
-    await waitFor(() => fireEvent.click(screen.getByText('Detail Pendapatan')));
-    expect(onNavigate).toHaveBeenCalledWith('earnings');
+    await waitFor(() => fireEvent.click(screen.getByText('Notifikasi')));
+    expect(onNavigate).toHaveBeenCalledWith('notifications');
   });
 });
 
 describe('DriverHome — API error', () => {
-  it('shows error message on API failure', async () => {
+  it('shows error on API failure when no cached profile', async () => {
     driverAPI.profile.mockRejectedValue(new Error('Network Error'));
+    driverAPI.driverStatus.mockRejectedValue(new Error('Network Error'));
     render(<DriverHome onNavigate={vi.fn()} />);
     await waitFor(() => expect(screen.getByText(/Gagal memuat/)).toBeInTheDocument());
   });

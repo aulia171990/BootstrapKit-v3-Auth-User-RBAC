@@ -61,7 +61,7 @@ export default function Drivers({ onNavigate }) {
     try {
       const d = await api.drivers();
       setDrivers(Array.isArray(d) ? d : (d.data ?? DEMO_DRIVERS));
-    } catch { setError(true); setDrivers(DEMO_DRIVERS); }
+    } catch { setError(true); }
     finally { setLoading(false); }
   }, []);
 

@@ -56,7 +56,7 @@ export default function DashboardHome({ onNavigate }) {
     try {
       const d = await api.dashboardStats();
       setStats({ ...DEMO_STATS, ...(d || {}) });
-    } catch { setError(true); setStats(DEMO_STATS); }
+    } catch { setError(true); }
     finally { setLoading(false); }
   }, [offline]);
 

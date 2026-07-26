@@ -7,6 +7,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/design-system/__tests__/setup.js'],
-    include: ['src/design-system/**/*.test.{js,jsx}', 'src/passenger/**/*.test.{js,jsx}', 'src/driver/**/*.test.{js,jsx}', 'src/operations-center/**/*.test.{js,jsx}'],
+    include: ['src/design-system/**/*.test.{js,jsx}', 'src/passenger/**/*.test.{js,jsx}', 'src/driver/**/*.test.{js,jsx}', 'src/operations-center/**/*.test.{js,jsx}', 'src/admin/**/*.test.{js,jsx}'],
   },
 });

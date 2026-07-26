@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Avatar, Badge, Icon, Button, Skeleton, ErrorState, EmptyState, Toast } from '../../design-system/index.js';
-import { User, ChevronLeft, ChevronRight, Camera, CheckCircle, AlertTriangle, FileImage, MapPin, Calendar, WifiOff, Loader, Save, X } from 'lucide-react';
+import { User, ChevronLeft, ChevronRight, Camera, CheckCircle, AlertTriangle, FileImage, MapPin, Calendar, WifiOff, Loader, Save, X, Mail } from 'lucide-react';
 import * as papi from '../api.js';
 import './profile.css';
 

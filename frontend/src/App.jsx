@@ -1,38 +1,73 @@
 import React, { useEffect, useState } from 'react';
 import { api, getToken, setToken, clearToken } from './api.js';
 import { leaveEcho } from './echo.js';
+import { Loading } from './design-system/index.js';
 import PassengerApp from './passenger/index.js';
 import AdminApp from './admin/AdminApp.jsx';
 import DriverApp from './driver/index.js';
 import OCCApp from './operations-center/index.js';
 
-const TENANT = import.meta.env.VITE_APP_TENANT || 'admin';
+const ROLE_APP_MAP = {
+  customer: PassengerApp,
+  driver: DriverApp,
+  admin: AdminApp,
+  superadmin: AdminApp,
+};
 
 export default function App() {
   const [token, setTk] = useState(getToken());
   const [me, setMe] = useState(null);
+  const [meLoaded, setMeLoaded] = useState(false);
 
   useEffect(() => {
-    if (token) api.me().then(setMe).catch(() => {});
+    if (token && !meLoaded) {
+      api.me().then(setMe).catch(() => {}).finally(() => setMeLoaded(true));
+    }
   }, [token]);
 
-  const handleLogout = () => { clearToken(); leaveEcho(); setTk(null); };
+  const handleLogout = () => { clearToken(); leaveEcho(); setTk(null); setMe(null); setMeLoaded(false); };
 
-  if (!token) return <Login onAuth={(t) => { setToken(t); setTk(t); }} />;
+  const handleAuth = (t, userData) => {
+    setToken(t);
+    setTk(t);
+    if (userData) {
+      setMe(userData);
+      setMeLoaded(true);
+    }
+  };
 
-  if (TENANT === 'passenger') {
-    return <PassengerApp user={me} onLogout={handleLogout} />;
+  if (!token) return <Login onAuth={handleAuth} />;
+
+  const envTenant = import.meta.env.VITE_APP_TENANT;
+
+  // Login response includes user data — use it directly for role routing
+  const user = me;
+  let role = user?.roles?.[0];
+  if (!role && envTenant) {
+    role = envTenant === 'passenger' ? 'customer' : envTenant;
   }
 
-  if (TENANT === 'driver') {
-    return <DriverApp user={me} onLogout={handleLogout} />;
+  if (envTenant && !role) {
+    if (envTenant === 'passenger') return <PassengerApp user={null} onLogout={handleLogout} />;
+    if (envTenant === 'driver') return <DriverApp user={null} onLogout={handleLogout} />;
+    if (envTenant === 'operations') return <OCCApp user={null} onLogout={handleLogout} />;
+    return <AdminApp me={null} onLogout={handleLogout} />;
   }
 
-  if (TENANT === 'operations') {
-    return <OCCApp user={me} onLogout={handleLogout} />;
+  if (!role) {
+    return meLoaded
+      ? <AdminApp me={null} onLogout={handleLogout} />
+      : <Loading label="Memuat profil..." />;
   }
 
-  return <AdminApp me={me} onLogout={handleLogout} />;
+  const AppComponent = ROLE_APP_MAP[role];
+  if (!AppComponent) return <AdminApp me={user} onLogout={handleLogout} />;
+
+  const props = role === 'admin' || role === 'superadmin'
+    ? { me: user, onLogout: handleLogout }
+    : { user, onLogout: handleLogout };
+
+  return <AppComponent {...props} />;
 }
 
 function Login({ onAuth }) {
@@ -45,7 +80,7 @@ function Login({ onAuth }) {
     setBusy(true); setErr('');
     try {
       const d = await api.login(email, password);
-      onAuth(d.token);
+      onAuth(d.token, d.user);
     } catch (ex) {
       setErr(ex.message);
     } finally { setBusy(false); }

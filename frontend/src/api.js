@@ -71,4 +71,18 @@ export const api = {
   bookingsHistory: (params = '') => req('/bookings/history' + (params ? `?${params}` : '')),
   bookingTrack: (id) => req('/bookings/' + id + '/track'),
   orderTrack: (id) => req('/orders/' + id + '/track'),
+
+  // ── Customer / Passenger module ──
+  customerProfile: () => req('/customer/profile'),
+  customerUpdateProfile: (data) => req('/customer/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  customerAddresses: () => req('/customer/addresses'),
+  customerCreateAddress: (addr) => req('/customer/addresses', { method: 'POST', body: JSON.stringify(addr) }),
+  customerUpdateAddress: (id, data) => req('/customer/addresses/' + id, { method: 'PUT', body: JSON.stringify(data) }),
+  customerDeleteAddress: (id) => req('/customer/addresses/' + id, { method: 'DELETE' }),
+
+  // ── Auth self-service ──
+  authChangePassword: (currentPassword, newPassword) => req('/auth/password/change', { method: 'POST', body: JSON.stringify({ current_password: currentPassword, password: newPassword }) }),
+  authDevices: () => req('/auth/devices'),
+  authRevokeDevice: (id) => req('/auth/devices/' + id, { method: 'DELETE' }),
+  authLogoutAll: () => req('/auth/logout-all', { method: 'POST' }),
 };

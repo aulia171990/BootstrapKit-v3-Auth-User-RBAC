@@ -1,3 +1,11 @@
 export { default } from './DriverApp.jsx';
 export { default as DriverApp } from './DriverApp.jsx';
 export { default as DriverHome } from './DriverHome.jsx';
+export { default as TripHistory } from './pages/TripHistory.jsx';
+export { default as TripDetail } from './pages/TripDetail.jsx';
+export { default as EarningsPage } from './pages/EarningsPage.jsx';
+export { default as WalletPage } from './pages/WalletPage.jsx';
+export { default as ProfilePage } from './pages/ProfilePage.jsx';
+export { default as NotificationsPage } from './pages/NotificationsPage.jsx';
+export { default as SafetyPage } from './pages/SafetyPage.jsx';
+export { driverAPI } from './driver-api.js';

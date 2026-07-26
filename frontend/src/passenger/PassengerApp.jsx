@@ -28,7 +28,7 @@ import NotificationPreferences from './activity/NotificationPreferences.jsx';
 import { ChatScreen, VoiceCall } from './communication/index.js';
 import { SafetyCenter } from './safety/index.js';
 import BookingMap from './booking/BookingMap/index.js';
-import { EmptyState } from '../design-system/index.js';
+import { EmptyState, PageTransition } from '../design-system/index.js';
 import ProfileHome from './profile/ProfileHome.jsx';
 import PersonalInformation from './profile/PersonalInformation.jsx';
 import SavedAddresses from './profile/SavedAddresses.jsx';
@@ -109,6 +109,7 @@ export default function PassengerApp({ user, onLogout }) {
 
   return (
     <div className="pasv-app" style={{ paddingBottom: 64 }}>
+      <PageTransition key={view.kind === 'tab' ? `tab-${view.id}` : view.kind} type="fade">
       {view.kind === 'destination' && (
         <DestinationSearch
           user={user}
@@ -486,6 +487,7 @@ export default function PassengerApp({ user, onLogout }) {
         />
       )}
 
+      </PageTransition>
       <BottomNavigation
         items={tabs.map((t) => ({ ...t, active: view.kind === 'tab' && view.id === t.id, onClick: () => goTab(t.id) }))}
         style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 30 }}

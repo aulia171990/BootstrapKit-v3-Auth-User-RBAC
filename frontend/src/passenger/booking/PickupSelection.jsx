@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
-  MapContainer, CurrentLocationButton, Input, Button, EmptyState, Loading, ErrorState, Icon,
+  MapContainer, CurrentLocationButton, Input, Button, EmptyState, Loading, Skeleton, ErrorState, Icon,
 } from '../../design-system/index.js';
 import { ChevronLeft, MapPin, LocateFixed, Search as SearchIcon, Navigation, X } from 'lucide-react';
 import * as papi from '../api.js';
@@ -86,7 +86,7 @@ export default function PickupSelection({ destination, user, onBack, onConfirmPi
       <Bar onBack={onBack} title="Pilih Titik Jemput" />
 
       {status === 'loading' ? (
-        <div className="pasv-book__scroll"><Loading label="Memuat peta…" /></div>
+        <div className="pasv-book__scroll"><div style={{ padding: 16 }}><Skeleton variant="card" lines={4} /></div></div>
       ) : (
         <>
           {/* Search pickup */}

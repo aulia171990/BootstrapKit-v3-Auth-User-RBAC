@@ -97,6 +97,12 @@ export default function AccountManagement({ onBack, onLogout }) {
           </Button>
         </div>
 
+        <div className="pasv-pro__card">
+          <Button variant="secondary" fullWidth onClick={onLogout}>
+            <LogOut size={14} /> Keluar (Perangkat Ini)
+          </Button>
+        </div>
+
         <div className="pasv-pro__version">Versi 3.2.1 (Build 42)</div>
       </div>
 

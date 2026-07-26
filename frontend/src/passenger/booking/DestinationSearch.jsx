@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
-  Input, MapContainer, CurrentLocationButton, EmptyState, Loading, ErrorState, Icon,
+  Input, MapContainer, CurrentLocationButton, EmptyState, Loading, Skeleton, ErrorState, Icon,
 } from '../../design-system/index.js';
 import {
   ChevronLeft, Search as SearchIcon, LocateFixed, Home, Building2, Heart, Star, Clock, X, MapPin,
@@ -151,7 +151,9 @@ export default function DestinationSearch({ user, onBack, onSelectDestination })
 
         {/* Results / suggestions / recents */}
         {status === 'loading' ? (
-          <Loading label="Memuat tempat…" />
+          <div style={{ padding: 16 }}>
+            <Skeleton variant="list" lines={4} />
+          </div>
         ) : (
           <div id="pasv-dest-list" role="listbox" aria-label="Daftar tujuan">
             {(() => {

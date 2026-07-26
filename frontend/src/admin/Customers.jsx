@@ -54,7 +54,7 @@ export default function Customers({ onNavigate }) {
     try {
       const d = await api.customers();
       setCustomers(Array.isArray(d) ? d : (d.data ?? DEMO_CUSTOMERS));
-    } catch { setError(true); setCustomers(DEMO_CUSTOMERS); }
+    } catch { setError(true); }
     finally { setLoading(false); }
   }, []);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   Avatar, NotificationBell, SearchBar, Card, MetricWidget, KPIGrid, ActivityFeed,
-  StatusIndicator, MapContainer, DriverMarker, Loading, EmptyState, ErrorState, Button, Icon,
+  StatusIndicator, MapContainer, DriverMarker, Loading, Skeleton, EmptyState, ErrorState, Button, Icon,
 } from '../design-system/index.js';
 import {
   Home, MapPin, Car, Package, Coffee, Utensils, Wallet, Bell, Navigation,
@@ -54,7 +54,13 @@ export default function PassengerHome({ user, onNavigate, onTopUp, onWalletHisto
     return (
       <div className="pasv-app" aria-busy="true">
         <AppBarSkeleton user={user} />
-        <div className="pasv-scroll"><Loading label="Memuat beranda…" /></div>
+        <div className="pasv-scroll">
+          <div style={{ padding: 16 }}>
+            <Skeleton variant="card" lines={2} />
+            <div style={{ marginTop: 12 }}><Skeleton variant="card" lines={3} /></div>
+            <div style={{ marginTop: 12 }}><Skeleton variant="list" lines={4} /></div>
+          </div>
+        </div>
       </div>
     );
   }

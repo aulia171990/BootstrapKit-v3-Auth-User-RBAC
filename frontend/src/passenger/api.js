@@ -914,7 +914,7 @@ export async function submitTripDispute(tripId, { reason, detail }) {
 export async function getProfile(user) {
   return liveOrFallback(
     async () => {
-      const u = await api.me();
+      const u = await api.customerProfile();
       return {
         name: u.name || '',
         email: u.email || '',
@@ -944,7 +944,7 @@ export async function getProfile(user) {
 export async function updateProfile(data) {
   return liveOrFallback(
     async () => {
-      const res = await api.authUpdateProfile?.(data) || { ok: true };
+      const res = await api.customerUpdateProfile(data);
       return res;
     },
     () => ({ ok: true }),
@@ -952,38 +952,79 @@ export async function updateProfile(data) {
 }
 
 export async function getSavedAddresses() {
-  await new Promise((r) => setTimeout(r, 200));
-  return [
-    { id: 'a1', label: 'Rumah', address: 'Jl. Merdeka No. 12, Jakarta', icon: 'home', lat: -6.2088, lng: 106.8456, isDefault: true },
-    { id: 'a2', label: 'Kantor', address: 'Menara BCA, Jl. Sudirman, Jakarta', icon: 'building', lat: -6.2250, lng: 106.8100, isDefault: false },
-    { id: 'a3', label: 'Kafe Senja', address: 'Jl. Gadjah Mada No. 8, Jakarta', icon: 'coffee', lat: -6.1850, lng: 106.8300, isDefault: false },
-  ];
+  return liveOrFallback(
+    async () => {
+      const list = await api.customerAddresses();
+      return (Array.isArray(list) ? list : []).map((a) => ({
+        id: String(a.id),
+        label: a.label || '',
+        address: a.address || '',
+        icon: a.icon || 'default',
+        lat: a.lat || a.latitude || null,
+        lng: a.lng || a.longitude || null,
+        isDefault: a.is_default || a.isDefault || false,
+      }));
+    },
+    () => [
+      { id: 'a1', label: 'Rumah', address: 'Jl. Merdeka No. 12, Jakarta', icon: 'home', lat: -6.2088, lng: 106.8456, isDefault: true },
+      { id: 'a2', label: 'Kantor', address: 'Menara BCA, Jl. Sudirman, Jakarta', icon: 'building', lat: -6.2250, lng: 106.8100, isDefault: false },
+      { id: 'a3', label: 'Kafe Senja', address: 'Jl. Gadjah Mada No. 8, Jakarta', icon: 'coffee', lat: -6.1850, lng: 106.8300, isDefault: false },
+    ],
+  );
 }
 
 export async function addAddress(addr) {
-  await new Promise((r) => setTimeout(r, 200));
-  return { id: `a${Date.now()}`, ...addr };
+  return liveOrFallback(
+    async () => {
+      const created = await api.customerCreateAddress(addr);
+      return { id: String(created.id), ...addr };
+    },
+    () => ({ id: `a${Date.now()}`, ...addr }),
+  );
 }
 
 export async function updateAddress(id, data) {
-  await new Promise((r) => setTimeout(r, 200));
-  return { id, ...data, ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.customerUpdateAddress(id, data);
+      return { id, ...data, ok: true };
+    },
+    () => ({ id, ...data, ok: true }),
+  );
 }
 
 export async function deleteAddress(id) {
-  await new Promise((r) => setTimeout(r, 200));
-  return { ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.customerDeleteAddress(id);
+      return { ok: true };
+    },
+    () => ({ ok: true }),
+  );
 }
 
 export async function setDefaultAddress(id) {
-  await new Promise((r) => setTimeout(r, 200));
-  return { ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.customerUpdateAddress(id, { is_default: true });
+      return { ok: true };
+    },
+    () => ({ ok: true }),
+  );
 }
 
 export async function updatePassword(currentPassword, newPassword) {
-  await new Promise((r) => setTimeout(r, 300));
-  if (currentPassword !== 'password123') throw new Error('Password saat ini salah');
-  return { ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.authChangePassword(currentPassword, newPassword);
+      return { ok: true };
+    },
+    async () => {
+      await new Promise((r) => setTimeout(r, 300));
+      if (currentPassword !== 'password123') throw new Error('Password saat ini salah');
+      return { ok: true };
+    },
+  );
 }
 
 export async function updatePin(currentPin, newPin) {
@@ -1005,22 +1046,46 @@ export async function getLoginHistory() {
 }
 
 export async function getTrustedDevices() {
-  await new Promise((r) => setTimeout(r, 200));
-  return [
-    { id: 'd1', name: 'iPhone 15 Pro', os: 'iOS 18.2', lastUsed: new Date(Date.now() - 3600e3).toISOString(), current: true },
-    { id: 'd2', name: 'MacBook Pro', os: 'macOS 15.2', lastUsed: new Date(Date.now() - 7 * 86400e3).toISOString(), current: false },
-    { id: 'd3', name: 'Samsung Galaxy S24', os: 'Android 15', lastUsed: new Date(Date.now() - 14 * 86400e3).toISOString(), current: false },
-  ];
+  return liveOrFallback(
+    async () => {
+      const list = await api.authDevices();
+      return (Array.isArray(list) ? list : []).map((d) => ({
+        id: String(d.id),
+        name: d.name || d.device_name || 'Perangkat',
+        os: d.os || d.platform || '',
+        lastUsed: d.last_used || d.lastUsed || d.updated_at || new Date().toISOString(),
+        current: d.is_current || d.current || false,
+      }));
+    },
+    () => [
+      { id: 'd1', name: 'iPhone 15 Pro', os: 'iOS 18.2', lastUsed: new Date(Date.now() - 3600e3).toISOString(), current: true },
+      { id: 'd2', name: 'MacBook Pro', os: 'macOS 15.2', lastUsed: new Date(Date.now() - 7 * 86400e3).toISOString(), current: false },
+      { id: 'd3', name: 'Samsung Galaxy S24', os: 'Android 15', lastUsed: new Date(Date.now() - 14 * 86400e3).toISOString(), current: false },
+    ],
+  );
 }
 
 export async function removeTrustedDevice(id) {
-  await new Promise((r) => setTimeout(r, 200));
-  return { ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.authRevokeDevice(id);
+      return { ok: true };
+    },
+    () => ({ ok: true }),
+  );
 }
 
 export async function logoutAllDevices() {
-  await new Promise((r) => setTimeout(r, 400));
-  return { ok: true };
+  return liveOrFallback(
+    async () => {
+      await api.authLogoutAll();
+      return { ok: true };
+    },
+    async () => {
+      await new Promise((r) => setTimeout(r, 400));
+      return { ok: true };
+    },
+  );
 }
 
 export async function deactivateAccount(password) {

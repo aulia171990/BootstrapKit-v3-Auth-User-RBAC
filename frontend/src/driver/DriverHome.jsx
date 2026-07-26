@@ -1,130 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Card, Avatar, Text, Heading, Button, Flex, Stack, Box,
-  StatusIndicator, LiveStatusBadge, Spinner
+  Card, Avatar, Text, Heading, Button, Flex, Loading, ErrorState, Skeleton,
 } from '../design-system/index.js';
-import { MapPin, DollarSign, ChevronRight, Bell } from 'lucide-react';
+import { Bell, DollarSign, ChevronRight, MapPin } from 'lucide-react';
 import { driverAPI } from './driver-api.js';
+import DriverHeader from './components/DriverHeader.jsx';
+import OnlineToggle from './components/OnlineToggle.jsx';
 
 export default function DriverHome({ user: propUser, onNavigate }) {
   const [profile, setProfile] = useState(propUser || null);
+  const [driverStats, setDriverStats] = useState(null);
   const [balance, setBalance] = useState(null);
+  const [today, setToday] = useState(null);
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
+  const [online, setOnline] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const [prof, bal, notif] = await Promise.all([
-          driverAPI.profile(),
-          driverAPI.earnings(),
-          driverAPI.notificationUnread(),
-        ]);
-        if (cancelled) return;
-        setProfile(prof);
-        setBalance(bal?.balance ?? bal);
-        setUnread(notif?.count ?? notif?.total ?? 0);
-      } catch (e) {
-        if (!cancelled) setError(e.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => { cancelled = true; };
+  const load = useCallback(async () => {
+    setLoading(true); setError(false);
+    try {
+      const [prof, stats, bal, td, notif] = await Promise.all([
+        driverAPI.profile().catch(() => propUser),
+        driverAPI.driverStatus(),
+        driverAPI.walletBalance(),
+        driverAPI.todayEarnings(),
+        driverAPI.notificationUnread(),
+      ]);
+      setProfile(prof);
+      setDriverStats(stats);
+      setBalance(bal?.balance ?? bal?.available_balance ?? bal);
+      setToday(td);
+      setUnread(notif?.count ?? notif?.total ?? 0);
+      setOnline(stats?.isOnline ?? true);
+    } catch { setError(true); }
+    finally { setLoading(false); }
   }, []);
 
-  if (loading) return <Flex style={{ height: '80vh', alignItems: 'center', justifyContent: 'center' }}><Spinner /></Flex>;
-  if (error) return <Box p={16}><Text color="danger">Gagal memuat: {error}</Text></Box>;
+  useEffect(() => { load(); }, [load]);
+
+  const handleToggleOnline = async () => {
+    const next = !online;
+    setOnline(next);
+    try {
+      await driverAPI.updateOnlineStatus(next ? 'online' : 'offline');
+    } catch { setOnline(!next); }
+  };
+
+  if (loading && !profile) return (
+    <div style={{ padding: 16 }}>
+      <Skeleton variant="card" lines={4} />
+      <div style={{ marginTop: 12 }}><Skeleton variant="card" lines={3} /></div>
+      <div style={{ marginTop: 12 }}><Skeleton variant="list" lines={4} /></div>
+    </div>
+  );
+  if (error && !profile) return <ErrorState title="Gagal memuat" description="Tidak dapat memuat dashboard." onRetry={load} />;
 
   return (
-    <div className="drv-home" style={{ padding: 16 }}>
-      {/* Header */}
-      <Flex style={{ alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <Avatar size="lg" name={profile?.name} src={profile?.photo} />
-        <Box>
-          <Heading size="sm">{profile?.name || 'Driver'}</Heading>
-          <Text size="xs" color="muted">{profile?.email || 'Tidak ada email'}</Text>
-        </Box>
-        <Box style={{ marginLeft: 'auto', position: 'relative' }} onClick={() => onNavigate('notifications')}>
-          <Bell size={20} />
-          {unread > 0 && (
-            <span style={{
-              position: 'absolute', top: -6, right: -6,
-              background: 'var(--ds-color-danger)', color: '#fff',
-              borderRadius: '50%', width: 18, height: 18,
-              fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>{unread}</span>
-          )}
-        </Box>
-      </Flex>
+    <div className="drv-home">
+      <DriverHeader driver={profile} unread={unread} onNotify={() => onNavigate('notifications')} onProfile={() => onNavigate('tab', { id: 'profile' })} />
 
-      {/* Online Status Card */}
-      <Card style={{ marginBottom: 16, background: 'var(--ds-color-primary-bg)' }}>
-        <Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <LiveStatusBadge status="online" label="Online" />
-            {profile?.zone && <Text size="sm" color="muted" style={{ marginTop: 4 }}>Zona: {profile.zone}</Text>}
-          </Box>
-          <Button variant="outline" size="sm" onClick={() => onNavigate('driverOffline')}>
-            Offline
-          </Button>
-        </Flex>
-      </Card>
+      <div style={{ padding: '12px 16px' }}>
+        <OnlineToggle
+          online={online}
+          onToggle={handleToggleOnline}
+          zone={driverStats?.zone}
+          todayTrips={driverStats?.todayTrips || today?.trips || 0}
+        />
 
-      {/* Earnings Summary */}
-      <Stack gap={12} style={{ marginBottom: 16 }}>
-        <Card>
-          <Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Text size="xs" color="muted">Saldo Hari Ini</Text>
-              <Heading size="md">
-                {balance != null
-                  ? `Rp ${Number(balance).toLocaleString('id-ID')}`
-                  : 'Rp 0'}
-              </Heading>
-            </Box>
-            <DollarSign color="var(--ds-color-primary)" />
-          </Flex>
-        </Card>
-      </Stack>
+        <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <Card style={{ textAlign: 'center' }} onClick={() => onNavigate('tab', { id: 'earnings' })}>
+            <DollarSign size={20} color="var(--ds-color-success)" style={{ margin: '0 auto 4px' }} />
+            <Text size="xs" color="muted">Pendapatan</Text>
+            <Heading size="xs" style={{ marginTop: 2 }}>
+              {today ? `Rp ${(today.total || 0).toLocaleString('id-ID')}` : '—'}
+            </Heading>
+          </Card>
+          <Card style={{ textAlign: 'center' }} onClick={() => onNavigate('tab', { id: 'trips' })}>
+            <MapPin size={20} color="var(--ds-color-primary)" style={{ margin: '0 auto 4px' }} />
+            <Text size="xs" color="muted">Trip Hari Ini</Text>
+            <Heading size="xs" style={{ marginTop: 2 }}>{today?.trips || driverStats?.todayTrips || 0}</Heading>
+          </Card>
+        </div>
 
-      {/* Quick Actions */}
-      <Heading size="xs" style={{ marginBottom: 10 }}>Menu Cepat</Heading>
-      <Stack gap={8}>
-        <Button variant="ghost" onClick={() => onNavigate('trips')}>
-          <Flex style={{ alignItems: 'center', gap: 10, width: '100%' }}>
-            <MapPin size={18} /> <Text>Riwayat Perjalanan</Text>
-            <ChevronRight size={18} style={{ marginLeft: 'auto' }} />
-          </Flex>
-        </Button>
-        <Button variant="ghost" onClick={() => onNavigate('earnings')}>
-          <Flex style={{ alignItems: 'center', gap: 10, width: '100%' }}>
-            <DollarSign size={18} /> <Text>Detail Pendapatan</Text>
-            <ChevronRight size={18} style={{ marginLeft: 'auto' }} />
-          </Flex>
-        </Button>
-      </Stack>
+        {balance != null && (
+          <Card style={{ marginTop: 12 }}>
+            <Flex style={{ justifyContent: 'space-between', alignItems: 'center' }} onClick={() => onNavigate('tab', { id: 'wallet' })}>
+              <div>
+                <Text size="xs" color="muted">Saldo Dompet</Text>
+                <Heading size="sm">Rp {Number(balance).toLocaleString('id-ID')}</Heading>
+              </div>
+              <ChevronRight size={18} color="var(--ds-color-text-muted)" />
+            </Flex>
+          </Card>
+        )}
 
-      {/* Active Trip Card (if any) */}
-      {profile?.active_trip && (
-        <Card style={{ marginTop: 16, borderLeft: '4px solid var(--ds-color-primary)' }}>
-          <Flex style={{ alignItems: 'center', gap: 12 }}>
-            <Box flex={1}>
-              <Text size="xs" color="muted">Perjalanan Aktif</Text>
-              <Text size="sm" weight="bold">{profile.active_trip.id}</Text>
-              <Text size="xs" color="muted">
-                {profile.active_trip.origin} → {profile.active_trip.destination}
-              </Text>
-            </Box>
-            <Button size="sm" onClick={() => onNavigate('tripDetail', profile.active_trip.id)}>
-              Buka
-            </Button>
-          </Flex>
-        </Card>
-      )}
+        {today?.bonus > 0 && (
+          <Card style={{ marginTop: 8, background: 'var(--ds-color-warning-bg, #fffbeb)' }}>
+            <Flex style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text size="sm" weight="bold">Bonus & Insentif</Text>
+              <Text size="sm" weight="bold" color="success">+Rp {(today.bonus || 0).toLocaleString('id-ID')}</Text>
+            </Flex>
+          </Card>
+        )}
+
+        <Heading size="xs" style={{ marginTop: 16, marginBottom: 8 }}>Menu Cepat</Heading>
+        <div className="drv-quick-grid">
+          <button className="drv-quick-btn" onClick={() => onNavigate('safety')}>
+            <div className="drv-quick-btn__icon drv-quick-btn__icon--danger">SOS</div>
+            <Text size="xs">Darurat</Text>
+          </button>
+          <button className="drv-quick-btn" onClick={() => onNavigate('notifications')}>
+            <Bell size={22} color="var(--ds-color-primary)" />
+            <Text size="xs">Notifikasi</Text>
+          </button>
+          <button className="drv-quick-btn" onClick={() => onNavigate('tab', { id: 'earnings' })}>
+            <DollarSign size={22} color="var(--ds-color-success)" />
+            <Text size="xs">Pendapatan</Text>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
