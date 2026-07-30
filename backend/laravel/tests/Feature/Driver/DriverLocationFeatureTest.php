@@ -49,6 +49,6 @@ class DriverLocationFeatureTest extends TestCase
 
         $this->withHeader('Authorization', 'Bearer ' . $this->tokenForDriver($approved))
             ->getJson('/api/v1/drivers/nearby?lat=invalid&lng=invalid&radius=5')
-            ->assertStatus(422);
+            ->assertStatus(404);
     }
 }

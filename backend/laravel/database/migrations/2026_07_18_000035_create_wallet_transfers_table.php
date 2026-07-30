@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wallet_transfers', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('from_wallet_id')->nullable()->constrained('wallets')->nullOnDelete();
             $table->foreignId('to_wallet_id')->nullable()->constrained('wallets')->nullOnDelete();
             $table->foreignId('wallet_transaction_id')->nullable()->constrained('wallet_transactions')->nullOnDelete();

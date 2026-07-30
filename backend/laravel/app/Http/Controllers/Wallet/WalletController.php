@@ -161,8 +161,8 @@ class WalletController extends Controller
         return response()->json(['success' => true, 'data' => $transactions], 200);
     }
 
-    public function transactions(): JsonResponse
+    public function transactions(HistoryRequest $request): JsonResponse
     {
-        return $this->history(request());
+        return $this->history($request);
     }
 }

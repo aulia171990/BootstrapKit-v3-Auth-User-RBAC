@@ -16,10 +16,15 @@ class SecurityHeadersMiddleware
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+        $wsHost = env('REVERB_HOST', '127.0.0.1');
+        $wsPort = env('REVERB_PORT', 8080);
+        $wsScheme = env('REVERB_SCHEME', 'http') === 'https' ? 'wss' : 'ws';
+        $wsOrigin = "{$wsScheme}://{$wsHost}:{$wsPort}";
+
         $csp = [
             "base-uri 'none'",
             "default-src 'self'",
-            "connect-src 'self'",
+            "connect-src 'self' {$wsOrigin}",
             "form-action 'self'",
             "frame-ancestors 'none'",
             "img-src * data:",

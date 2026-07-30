@@ -7,10 +7,17 @@ import * as papi from '../api.js';
 
 const user = { name: 'Budi Santoso', email: 'budi@ojol.id' };
 
+beforeEach(() => {
+  vi.spyOn(papi, 'getPromotions').mockResolvedValue([]);
+  vi.spyOn(papi, 'getWallet').mockResolvedValue({ balance: 125000, currency: 'IDR', pending: 0 });
+});
+
+afterEach(() => { vi.restoreAllMocks(); });
+
 describe('PassengerHome — component', () => {
   it('shows loading then renders greeting + sections', async () => {
-    render(<PassengerHome user={user} onNavigate={vi.fn()} />);
-    expect(screen.getByText('Memuat beranda…')).toBeInTheDocument(); // Loading
+    const { container } = render(<PassengerHome user={user} onNavigate={vi.fn()} />);
+    expect(container.querySelector('[aria-busy="true"]')).toBeTruthy(); // Loading skeleton
     await waitFor(() => expect(screen.getByText('Mau ke mana hari ini?')).toBeInTheDocument());
     expect(screen.getByText('Promo untukmu')).toBeInTheDocument();
     expect(screen.getByText('Tujuan terakhir')).toBeInTheDocument();

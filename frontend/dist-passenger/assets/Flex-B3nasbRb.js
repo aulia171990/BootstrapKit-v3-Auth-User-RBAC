@@ -1,0 +1,1 @@
+import{j as f,s as o,a as p}from"./index-cIZteAV5.js";function d({children:s,direction:a="row",align:i="center",justify:l,gap:e,wrap:t=!1,inline:n=!1,className:r,...x}){return f.jsx("div",{className:p("ds-flex",r),style:{display:n?"inline-flex":"flex",flexDirection:a,alignItems:i,justifyContent:l,gap:e?o(e):void 0,flexWrap:t?"wrap":void 0},...x,children:s})}export{d as F};

@@ -14,6 +14,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        // Auto-map: any ability name that matches a permission code passes.
+        Gate::before(function (User $user, string $ability) {
+            if ($user->hasPermission($ability)) {
+                return true;
+            }
+        });
+
         // Role gate: user holds the given role.
         Gate::define('role', function (User $user, string $role) {
             return $user->hasRole($role);

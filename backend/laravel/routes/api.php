@@ -164,6 +164,11 @@ Route::prefix('v1')->group(function () {
         });
 
         // ── Driver module ──
+        Route::prefix('driver')->group(function () {
+            Route::get('/profile', [App\Http\Controllers\Driver\DriverController::class, 'profile']);
+            Route::put('/profile', [App\Http\Controllers\Driver\DriverController::class, 'updateProfile']);
+        });
+
         // Readable by any authed user (index/show), so keep them outside the
         // verified gate. Specific actions are declared below.
         Route::post('/drivers/location', [App\Http\Controllers\Driver\DriverController::class, 'updateLocation']);

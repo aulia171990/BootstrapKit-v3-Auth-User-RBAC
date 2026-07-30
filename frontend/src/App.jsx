@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { api, getToken, setToken, clearToken } from './api.js';
 import { leaveEcho } from './echo.js';
 import { Loading } from './design-system/index.js';
-import PassengerApp from './passenger/index.js';
-import AdminApp from './admin/AdminApp.jsx';
-import DriverApp from './driver/index.js';
-import OCCApp from './operations-center/index.js';
+
+const PassengerApp = lazy(() => import('./passenger/index.js'));
+const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
+const DriverApp = lazy(() => import('./driver/index.js'));
+const OCCApp = lazy(() => import('./operations-center/index.js'));
 
 const ROLE_APP_MAP = {
   customer: PassengerApp,
@@ -24,6 +25,13 @@ export default function App() {
       api.me().then(setMe).catch(() => {}).finally(() => setMeLoaded(true));
     }
   }, [token]);
+
+  useEffect(() => {
+    const tenant = import.meta.env.VITE_APP_TENANT;
+    if (tenant === 'passenger') document.title = 'Ojol Passenger';
+    else if (tenant === 'driver') document.title = 'Ojol Driver';
+    else document.title = 'Ojol Admin';
+  }, []);
 
   const handleLogout = () => { clearToken(); leaveEcho(); setTk(null); setMe(null); setMeLoaded(false); };
 
@@ -47,6 +55,12 @@ export default function App() {
     role = envTenant === 'passenger' ? 'customer' : envTenant;
   }
 
+  return <Suspense fallback={<Loading label="Memuat aplikasi..." />}>
+    {renderApp(envTenant, role, user, meLoaded, handleLogout)}
+  </Suspense>;
+}
+
+function renderApp(envTenant, role, user, meLoaded, handleLogout) {
   if (envTenant && !role) {
     if (envTenant === 'passenger') return <PassengerApp user={null} onLogout={handleLogout} />;
     if (envTenant === 'driver') return <DriverApp user={null} onLogout={handleLogout} />;

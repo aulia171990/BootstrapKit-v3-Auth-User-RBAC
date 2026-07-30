@@ -28,7 +28,6 @@ class ApiResponseEnvelopeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->artisan('migrate')->assertSuccessful();
         $this->seed(\Database\Seeders\DatabaseSeeder::class);
         app('cache')->flush();
     }

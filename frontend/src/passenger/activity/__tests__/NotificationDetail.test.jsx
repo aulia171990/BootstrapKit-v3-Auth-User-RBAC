@@ -14,7 +14,7 @@ const base = {
 beforeEach(() => {
   vi.restoreAllMocks();
   resetNotifications();
-  vi.spyOn(papi, 'getNotifications').mockResolvedValue([base]);
+  setNotifications([base]);
 });
 
 describe('NotificationDetail — 6B', () => {

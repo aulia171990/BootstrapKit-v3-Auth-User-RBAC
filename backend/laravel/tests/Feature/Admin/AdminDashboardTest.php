@@ -5,11 +5,18 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Services\Admin\DashboardService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
 
 class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+    }
 
     public function test_dashboard_stats_returns_expected_keys(): void
     {
@@ -45,14 +52,17 @@ class AdminDashboardTest extends TestCase
     public function test_admin_dashboard_endpoints_are_registered(): void
     {
         $user = User::factory()->create(['email_verified' => true]);
+        $token = JWTAuth::fromUser($user);
 
-        $response = $this->actingAs($user)->get('/api/v1/admin/dashboard/stats');
-        $response->assertStatus(403);
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->get('/api/v1/admin/dashboard/stats')
+            ->assertStatus(403);
 
-        $admin = User::factory()->create(['email_verified' => true]);
-        $admin->roles()->attach(\App\Models\Role::where('name', 'admin')->firstOrFail()->id);
+        $admin = User::where('email', 'admin@ojol.test')->first();
+        $token = JWTAuth::fromUser($admin);
 
-        $response = $this->actingAs($admin)->get('/api/v1/admin/dashboard/stats');
-        $response->assertStatus(200);
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->get('/api/v1/admin/dashboard/stats')
+            ->assertStatus(200);
     }
 }

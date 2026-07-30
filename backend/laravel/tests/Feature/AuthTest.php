@@ -20,7 +20,6 @@ class AuthTest extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate')->assertSuccessful();
         $this->seed(\Database\Seeders\DatabaseSeeder::class);
 
         // Rate-limiter state lives in the array cache and leaks across tests;
@@ -33,7 +32,7 @@ class AuthTest extends TestCase
     {
         $response = $this->postJson('/api/v1/auth/register', [
             'name'     => 'Budi',
-            'email'    => 'budi@ojol.test',
+            'email'    => 'budi2@ojol.test',
             'phone'    => '6281200000011',
             'password' => 'Newsecret1!',
             'password_confirmation' => 'Newsecret1!',
@@ -46,10 +45,10 @@ class AuthTest extends TestCase
             ])
             ->assertJsonPath('data.user.roles.0', 'customer');
 
-        $this->assertDatabaseHas('users', ['email' => 'budi@ojol.test']);
+        $this->assertDatabaseHas('users', ['email' => 'budi2@ojol.test']);
         // A refresh token row was persisted server-side.
         $this->assertDatabaseHas('refresh_tokens', [
-            'user_id' => User::where('email', 'budi@ojol.test')->first()->id,
+            'user_id' => $response->json('data.user.id'),
         ]);
     }
 

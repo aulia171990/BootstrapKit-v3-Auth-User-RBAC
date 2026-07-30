@@ -121,6 +121,35 @@ class DriverController extends Controller
         return ApiResponse::success($driver, 'Driver offline');
     }
 
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        $driver = $user->driver;
+
+        if (! $driver) {
+            return ApiResponse::error('Profil driver belum dibuat', 404);
+        }
+
+        return ApiResponse::success($driver->load('user', 'documents', 'vehicles'));
+    }
+
+    public function updateProfile(UpdateDriverRequest $request)
+    {
+        $user = $request->user();
+        $driver = $user->driver;
+
+        if (! $driver) {
+            return ApiResponse::error('Profil driver belum dibuat', 404);
+        }
+
+        $driver = $this->driverService->updateProfile(
+            (string) $user->id,
+            $request->validated()
+        );
+
+        return ApiResponse::success($driver, 'Profil driver diperbarui');
+    }
+
     public function updateLocation(LocationUpdateRequest $request)
     {
         $user = $request->user();

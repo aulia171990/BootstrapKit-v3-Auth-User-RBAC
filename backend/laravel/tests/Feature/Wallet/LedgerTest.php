@@ -4,11 +4,14 @@ namespace Tests\Feature\Wallet;
 
 use App\DTOs\Wallet\LedgerEntry;
 use App\Services\Wallet\LedgerService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LedgerTest extends TestCase
 {
+    use RefreshDatabase;
+
     #[Test]
     public function ledger_is_balanced_for_debit_and_credit(): void
     {

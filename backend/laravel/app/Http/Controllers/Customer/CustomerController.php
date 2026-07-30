@@ -37,16 +37,24 @@ class CustomerController extends Controller
 
     public function profile(Request $request)
     {
-        return ApiResponse::success($this->profileService->show((string) $request->user()->id));
+        try {
+            return ApiResponse::success($this->profileService->show((string) $request->user()->id));
+        } catch (\InvalidArgumentException) {
+            return ApiResponse::error('Profil customer belum dibuat', 404);
+        }
     }
 
     public function updateProfile(CustomerProfileRequest $request)
     {
-        $profile = $this->profileService->update((string) $request->user()->id, $request->validated());
+        try {
+            $profile = $this->profileService->update((string) $request->user()->id, $request->validated());
 
-        CustomerProfileUpdated::dispatch($profile);
+            CustomerProfileUpdated::dispatch($profile);
 
-        return ApiResponse::success($profile, 'Profil diperbarui');
+            return ApiResponse::success($profile, 'Profil diperbarui');
+        } catch (\InvalidArgumentException) {
+            return ApiResponse::error('Profil customer belum dibuat', 404);
+        }
     }
 
     public function addresses(Request $request)

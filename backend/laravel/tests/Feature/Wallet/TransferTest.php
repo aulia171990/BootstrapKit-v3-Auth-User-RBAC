@@ -5,11 +5,14 @@ namespace Tests\Feature\Wallet;
 use App\Repositories\Wallet\WalletRepository;
 use App\Services\Wallet\WalletService;
 use App\Services\Wallet\TransferService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TransferTest extends TestCase
 {
+    use RefreshDatabase;
+
     #[Test]
     public function transfer_creates_transfer_record(): void
     {
@@ -20,7 +23,7 @@ class TransferTest extends TestCase
         $tx = (new TransferService(new \App\Repositories\Wallet\TransferRepository()))
             ->execute($walletA, $walletB, new \App\DTOs\Wallet\TransferRequest($walletA->id, $walletB->id, 1500));
 
-        $this->assertSame(1500, $tx->amount);
+        $this->assertEquals(1500, $tx->amount);
         $this->assertSame($walletA->id, $tx->from_wallet_id);
         $this->assertSame($walletB->id, $tx->to_wallet_id);
     }

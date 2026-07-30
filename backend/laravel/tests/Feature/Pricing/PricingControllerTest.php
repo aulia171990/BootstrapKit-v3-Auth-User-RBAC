@@ -46,13 +46,15 @@ class PricingControllerTest extends TestCase
             ->assertJsonStructure(['data', 'meta']);
     }
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+    }
+
     private function adminUser(): \App\Models\User
     {
-        $user = \App\Models\User::factory()->create();
-        $adminRole = \App\Models\Role::where('name', 'admin')->first();
-        if ($adminRole) {
-            $user->roles()->attach($adminRole->id);
-        }
+        $user = \App\Models\User::where('email', 'admin@ojol.test')->first();
 
         return $user;
     }

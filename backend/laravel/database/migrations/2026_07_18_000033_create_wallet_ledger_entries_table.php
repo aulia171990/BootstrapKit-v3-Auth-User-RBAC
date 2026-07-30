@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('reference_id')->nullable();
             $table->text('description')->nullable();
             $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
 
             $table->index(['wallet_id', 'transaction_id']);
         });

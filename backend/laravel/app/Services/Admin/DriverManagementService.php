@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class DriverManagementService
 {
+    public function index(int $perPage = 20)
+    {
+        return \App\Models\Driver::with('user')->paginate($perPage);
+    }
+
     public function approve(string $driverId): void
     {
         // Placeholder driver approval hook. Use existing DriverService when available.

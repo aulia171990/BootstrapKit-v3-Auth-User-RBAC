@@ -19,6 +19,13 @@ describe('Promo & Voucher (4E)', () => {
       { id: 'p5', code: 'POOL5', title: 'Voucher 5rb', subtitle: 's', kind: 'voucher', tone: 'success', value: 5000, valueType: 'amount', minSpend: 0, category: 'trip', status: 'used', eligible: false, eligibilityNote: 'Terpakai', description: 'd', terms: 't', usedAt: new Date(Date.now() - 1e9).toISOString(), expiry: new Date(Date.now() - 2e9).toISOString() },
     ]);
     vi.spyOn(papi, 'getAppliedPromo').mockResolvedValue(null);
+    vi.spyOn(papi, 'getPromoDetail').mockImplementation(async (id) => {
+      const pool = [
+        { id: 'p1', code: 'HALO50', title: 'Diskon 50%', subtitle: 'Hari ini', kind: 'campaign', tone: 'primary', value: 50, valueType: 'percent', minSpend: 0, category: 'trip', status: 'active', eligible: true, eligibilityNote: 'Pengguna baru', description: 'd', terms: 't', expiry: new Date(Date.now() + 1e9).toISOString() },
+        { id: 'p2', code: 'JALAN15', title: 'Voucher Rp15.000', subtitle: 'Min. 30rb', kind: 'voucher', tone: 'success', value: 15000, valueType: 'amount', minSpend: 30000, category: 'trip', status: 'active', eligible: false, eligibilityNote: 'Tidak berhak', description: 'd', terms: 't', expiry: new Date(Date.now() + 1e9).toISOString() },
+      ];
+      return pool.find((p) => p.id === id) || null;
+    });
   };
 
   it('lists active vouchers with eligibility gating', async () => {

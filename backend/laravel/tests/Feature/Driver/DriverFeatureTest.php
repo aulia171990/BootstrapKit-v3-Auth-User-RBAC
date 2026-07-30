@@ -6,29 +6,46 @@ use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\Role;
 use App\Models\User;
-use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
 
 class DriverFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    private function createAdminUser(): User
     {
-        parent::setUp();
+        $role = Role::create(['name' => 'admin']);
+        foreach (['dashboard.view', 'driver.manage', 'driver.view', 'driver.approve', 'driver.reject', 'driver.suspend'] as $code) {
+            $perm = \App\Models\Permission::firstOrCreate(['code' => $code], ['code' => $code, 'name' => $code]);
+            $role->permissions()->syncWithoutDetaching([$perm->id]);
+        }
 
-        $this->seed(PermissionSeeder::class);
+        $user = User::factory()->create(['email_verified' => true]);
+        $user->roles()->attach($role->id);
+        return $user;
+    }
+
+    private function createDriverUser(): User
+    {
+        $role = Role::create(['name' => 'driver']);
+        foreach (['order.accept', 'driver.location'] as $code) {
+            $perm = \App\Models\Permission::firstOrCreate(['code' => $code], ['code' => $code, 'name' => $code]);
+            $role->permissions()->syncWithoutDetaching([$perm->id]);
+        }
+
+        $user = User::factory()->create(['email_verified' => true]);
+        $user->roles()->attach($role->id);
+        return $user;
     }
 
     public function test_admin_can_list_drivers(): void
     {
-        $login = $this->postJson('/api/v1/auth/login', [
-            'email' => 'admin@ojol.test',
-            'password' => 'password',
-        ])->json('data.token');
+        $admin = $this->createAdminUser();
+        $token = JWTAuth::fromUser($admin);
 
-        $this->withHeader('Authorization', 'Bearer ' . $login)
+        $this->withHeader('Authorization', 'Bearer ' . $token)
             ->getJson('/api/v1/drivers')
             ->assertStatus(200)
             ->assertJsonStructure(['success', 'data']);
@@ -36,15 +53,14 @@ class DriverFeatureTest extends TestCase
 
     public function test_driver_cannot_approve_driver(): void
     {
-        $driver = User::factory()->create();
-        $driver->roles()->attach(Role::where('name', 'driver')->first()->id);
-        $token = $this->postJson('/api/v1/auth/login', [
-            'email' => $driver->email,
-            'password' => 'password',
-        ])->json('data.token');
+        $driver = $this->createDriverUser();
+        $token = JWTAuth::fromUser($driver);
 
+        // Create a driver profile for the admin user so the approval endpoint
+        // has a target to act on.
+        $targetUser = User::factory()->create();
         $target = Driver::create([
-            'user_id' => User::factory()->create()->id,
+            'user_id' => $targetUser->id,
             'status' => 'pending',
             'verification_status' => 'pending',
         ]);
@@ -62,12 +78,10 @@ class DriverFeatureTest extends TestCase
             'verification_status' => 'pending',
         ]);
 
-        $login = $this->postJson('/api/v1/auth/login', [
-            'email' => 'admin@ojol.test',
-            'password' => 'password',
-        ])->json('data.token');
+        $admin = $this->createAdminUser();
+        $token = JWTAuth::fromUser($admin);
 
-        $this->withHeader('Authorization', 'Bearer ' . $login)
+        $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/v1/drivers/' . $target->id . '/approve', ['note' => 'ok'])
             ->assertStatus(200)
             ->assertJsonPath('data.verification_status', 'approved');
@@ -86,12 +100,10 @@ class DriverFeatureTest extends TestCase
             'verification_status' => 'pending',
         ]);
 
-        $login = $this->postJson('/api/v1/auth/login', [
-            'email' => 'admin@ojol.test',
-            'password' => 'password',
-        ])->json('data.token');
+        $admin = $this->createAdminUser();
+        $token = JWTAuth::fromUser($admin);
 
-        $this->withHeader('Authorization', 'Bearer ' . $login)
+        $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/v1/drivers/' . $target->id . '/reject', ['note' => 'dokumen kurang'])
             ->assertStatus(200)
             ->assertJsonPath('data.verification_status', 'rejected');
@@ -110,12 +122,10 @@ class DriverFeatureTest extends TestCase
             'verification_status' => 'pending',
         ]);
 
-        $login = $this->postJson('/api/v1/auth/login', [
-            'email' => 'admin@ojol.test',
-            'password' => 'password',
-        ])->json('data.token');
+        $admin = $this->createAdminUser();
+        $token = JWTAuth::fromUser($admin);
 
-        $this->withHeader('Authorization', 'Bearer ' . $login)
+        $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/v1/drivers/' . $target->id . '/suspend', ['note' => 'melanggar SOP'])
             ->assertStatus(200)
             ->assertJsonPath('data.verification_status', 'suspended');
@@ -129,10 +139,7 @@ class DriverFeatureTest extends TestCase
     public function test_owner_can_go_online_and_offline(): void
     {
         $user = User::factory()->create();
-        $token = $this->postJson('/api/v1/auth/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ])->json('data.token');
+        $token = JWTAuth::fromUser($user);
 
         $target = Driver::create([
             'user_id' => $user->id,
@@ -151,10 +158,7 @@ class DriverFeatureTest extends TestCase
     public function test_owner_can_upload_document(): void
     {
         $user = User::factory()->create();
-        $token = $this->postJson('/api/v1/auth/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ])->json('data.token');
+        $token = JWTAuth::fromUser($user);
 
         $target = Driver::create(['user_id' => $user->id]);
 
@@ -174,5 +178,69 @@ class DriverFeatureTest extends TestCase
             'action' => 'document_uploaded',
             'context->driver_id' => $target->id,
         ]);
+    }
+
+    public function test_driver_can_get_own_profile(): void
+    {
+        $user = User::factory()->create(['email_verified' => true]);
+        $token = JWTAuth::fromUser($user);
+
+        $driver = Driver::create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'verification_status' => 'approved',
+        ]);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/driver/profile')
+            ->assertStatus(200)
+            ->assertJsonPath('data.id', $driver->id)
+            ->assertJsonStructure(['success', 'data' => ['id', 'user', 'status']]);
+    }
+
+    public function test_driver_profile_returns_404_when_no_driver_record(): void
+    {
+        $user = User::factory()->create(['email_verified' => true]);
+        $token = JWTAuth::fromUser($user);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/driver/profile')
+            ->assertStatus(404)
+            ->assertJsonPath('message', 'Profil driver belum dibuat');
+    }
+
+    public function test_driver_can_update_own_profile(): void
+    {
+        $user = User::factory()->create(['email_verified' => true]);
+        $token = JWTAuth::fromUser($user);
+
+        $driver = Driver::create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'verification_status' => 'approved',
+        ]);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson('/api/v1/driver/profile', [
+                'license_plate' => 'B 1234 XYZ',
+                'vehicle_type' => 'motor',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.license_plate', 'B 1234 XYZ');
+
+        $this->assertDatabaseHas('drivers', [
+            'id' => $driver->id,
+            'license_plate' => 'B 1234 XYZ',
+            'vehicle_type' => 'motor',
+        ]);
+    }
+
+    public function test_driver_profile_requires_authentication(): void
+    {
+        $this->getJson('/api/v1/driver/profile')
+            ->assertStatus(401);
+
+        $this->putJson('/api/v1/driver/profile', ['license_plate' => 'B 1234 XYZ'])
+            ->assertStatus(401);
     }
 }

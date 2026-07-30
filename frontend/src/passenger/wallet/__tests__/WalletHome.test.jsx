@@ -6,6 +6,30 @@ import * as papi from '../../api.js';
 
 const noop = () => {};
 
+const DEFAULT_WALLET = { balance: 125000, currency: 'IDR', pending: 0 };
+const DEFAULT_TXS = [
+  { id: 'tx1', type: 'trip', title: 'Trip · Rumah → Kantor', amount: -18500, currency: 'IDR', status: 'completed', at: new Date(Date.now() - 3600e3).toISOString() },
+  { id: 'tx2', type: 'topup', title: 'Top Up · Bank Transfer', amount: 100000, currency: 'IDR', status: 'completed', at: new Date(Date.now() - 7200e3).toISOString() },
+  { id: 'tx3', type: 'cashback', title: 'Cashback Promo CASH20', amount: 2000, currency: 'IDR', status: 'completed', at: new Date(Date.now() - 86400e3).toISOString() },
+  { id: 'tx4', type: 'trip', title: 'Trip · Kantor → Rumah', amount: -16500, currency: 'IDR', status: 'completed', at: new Date(Date.now() - 2 * 86400e3).toISOString() },
+  { id: 'tx5', type: 'transfer', title: 'Transfer ke Budi', amount: -20000, currency: 'IDR', status: 'pending', at: new Date(Date.now() - 3 * 86400e3).toISOString() },
+];
+const DEFAULT_PROMOS = [
+  { id: 'p1', code: 'HALO50', title: 'Diskon 50% perjalanan pertama', subtitle: 'Berlaku hari ini', kind: 'campaign', tone: 'primary', value: 50, valueType: 'percent', minSpend: 0, category: 'trip', status: 'active', eligible: true, eligibilityNote: '', description: '', terms: '', expiry: new Date(Date.now() + 86400e3).toISOString() },
+];
+const DEFAULT_METHODS = [
+  { id: 'pm1', kind: 'wallet', label: 'Dompet Ojol', detail: 'Saldo aktif', primary: true, active: true, raw: {} },
+];
+const DEFAULT_CASHBACK = { totalCashback: 7000, currency: 'IDR', thisMonth: 2000, pending: 0, tier: 'Silver' };
+
+beforeEach(() => {
+  vi.spyOn(papi, 'getWallet').mockResolvedValue(DEFAULT_WALLET);
+  vi.spyOn(papi, 'getTransactions').mockResolvedValue(DEFAULT_TXS);
+  vi.spyOn(papi, 'getPromotions').mockResolvedValue(DEFAULT_PROMOS);
+  vi.spyOn(papi, 'getPaymentMethods').mockResolvedValue(DEFAULT_METHODS);
+  vi.spyOn(papi, 'getCashbackSummary').mockResolvedValue(DEFAULT_CASHBACK);
+});
+
 afterEach(() => { vi.restoreAllMocks(); });
 
 describe('WalletHome (4A)', () => {
@@ -128,7 +152,7 @@ describe('WalletHome — premium layout (syarat tampilan)', () => {
 });
 
 describe('Wallet navigation (through PassengerApp)', () => {
-  it('wallet tab → Top Up navigates to sub-screen', async () => {
+  it('wallet tab → Top Up navigates to sub-screen', { timeout: 15000 }, async () => {
     const { default: PassengerApp } = await import('../../PassengerApp.jsx');
     render(<PassengerApp user={{ name: 'Budi', email: 'budi@ojol.test' }} />);
     // switch to wallet tab

@@ -3,11 +3,14 @@
 namespace Tests\Feature\Wallet;
 
 use App\Repositories\Wallet\WalletRepository;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class WalletServiceTest extends TestCase
 {
+    use RefreshDatabase;
+
     #[Test]
     public function wallet_service_creates_wallet_when_missing_and_returns_found(): void
     {
