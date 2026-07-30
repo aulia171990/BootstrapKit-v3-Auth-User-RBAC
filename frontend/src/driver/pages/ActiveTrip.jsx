@@ -5,8 +5,7 @@ import ConfirmationModal from '../components/ConfirmationModal.jsx';
 
 const STEPS = [
   { key: 'accepted', label: 'Menuju Penumpang', desc: 'Ambil pesanan di lokasi pickup' },
-  { key: 'arrived', label: 'Sudah Sampai', desc: 'Konfirmasi sudah sampai di lokasi' },
-  { key: 'in_progress', label: 'Dalam Perjalanan', desc: 'Menuju lokasi tujuan' },
+  { key: 'ongoing', label: 'Dalam Perjalanan', desc: 'Trip berjalan' },
   { key: 'completed', label: 'Selesai', desc: 'Trip selesai' },
 ];
 
@@ -20,6 +19,8 @@ export default function ActiveTrip({ trip: initialTrip, onBack, onUpdate, tripSt
   const currentStepIdx = STEPS.findIndex((s) => s.key === trip?.status);
   const currentStep = currentStepIdx >= 0 ? STEPS[currentStepIdx] : null;
   const isCompleted = trip?.status === 'completed';
+  const isAccepted = trip?.status === 'accepted';
+  const isOngoing = trip?.status === 'ongoing';
 
   const advanceStep = useCallback(async (status, payload = {}) => {
     setLoading(true);
@@ -91,7 +92,7 @@ export default function ActiveTrip({ trip: initialTrip, onBack, onUpdate, tripSt
 
       <div className="drv-active-trip__body">
         <div className="drv-step-indicator">
-          {STEPS.slice(0, 3).map((step, i) => (
+          {STEPS.map((step, i) => (
             <div key={step.key} className={`drv-step ${i <= currentStepIdx ? 'drv-step--active' : ''} ${i < currentStepIdx ? 'drv-step--done' : ''}`}>
               <div className="drv-step__dot">
                 {i < currentStepIdx ? <CheckCircle size={16} /> : i + 1}
@@ -145,40 +146,14 @@ export default function ActiveTrip({ trip: initialTrip, onBack, onUpdate, tripSt
 
         {!isCompleted && (
           <>
-            {trip.status === 'accepted' && (
-              <div>
-                <Button variant="primary" style={{ width: '100%', marginBottom: 8 }}
-                  onClick={handleArrived} disabled={loading}>
-                  {loading ? 'Memproses...' : 'Saya Sudah Sampai'}
-                </Button>
-                <Text size="xs" color="muted" style={{ textAlign: 'center' }}>
-                  Konfirmasi setelah tiba di lokasi pickup
-                </Text>
-              </div>
+            {isAccepted && (
+              <Button variant="primary" style={{ width: '100%', marginTop: 8 }}
+                onClick={handleStartTrip} disabled={loading}>
+                {loading ? 'Memproses...' : 'Mulai Perjalanan'}
+              </Button>
             )}
 
-            {trip.status === 'arrived' && (
-              <div>
-                <Text size="sm" weight="bold" style={{ marginBottom: 8 }}>Verifikasi Pickup</Text>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <input
-                    className="drv-code-input"
-                    placeholder="Masukkan kode pickup"
-                    value={codeInput}
-                    onChange={(e) => { setCodeInput(e.target.value); setCodeError(''); }}
-                    style={{ flex: 1 }}
-                  />
-                  <Button size="sm" onClick={verifyCode} disabled={!codeInput || loading}>Verifikasi</Button>
-                </div>
-                {codeError && <Text size="xs" color="danger">{codeError}</Text>}
-                <Button variant="ghost" size="xs" style={{ width: '100%', marginTop: 4 }}
-                  onClick={handleStartTrip} disabled={loading}>
-                  Lewati verifikasi (Mulai Perjalanan)
-                </Button>
-              </div>
-            )}
-
-            {trip.status === 'in_progress' && (
+            {isOngoing && (
               <Button variant="primary" style={{ width: '100%', marginTop: 8, background: 'var(--ds-color-success)' }}
                 onClick={handleComplete} disabled={loading}>
                 {loading ? 'Memproses...' : 'Selesai'}

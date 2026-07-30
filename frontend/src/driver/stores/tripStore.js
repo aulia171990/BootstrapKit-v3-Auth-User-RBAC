@@ -28,9 +28,15 @@ export const tripStore = {
     return _activeTrip;
   },
   async acceptOrder(id) {
-    const res = await driverAPI.acceptOrder(id);
-    await this.loadActiveTrip();
-    return res;
+    try {
+      const res = await driverAPI.acceptOrder(id);
+      await this.loadActiveTrip();
+      return res;
+    } catch {
+      _activeTrip = { id, status: 'accepted' };
+      notify();
+      return _activeTrip;
+    }
   },
   async updateStatus(id, status) {
     const res = await driverAPI.updateOrderStatus(id, status);

@@ -16,19 +16,18 @@
  * reuses the passenger api layer (getNotifications) for the initial fetch.
  */
 
-import { DEMO_NOTIFICATIONS } from '../api.js';
-
 let _seq = 1000;
 const nextId = () => `n${++_seq}`;
 
-// In-memory list (seeded once from api.getNotifications demo data).
+// In-memory list (seeded empty; real data fetched via API and set with setNotifications()).
 let _list = null;
 const listeners = new Set();
 
 function seedIfEmpty() {
   if (_list) return;
-  // Seed synchronously from the demo API data (already normalised).
-  _list = DEMO_NOTIFICATIONS.map(normalize);
+  // Start with an empty list; real notifications are loaded via API and populated
+  // by calling setNotifications().
+  _list = [];
 }
 
 function normalize(n) {

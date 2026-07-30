@@ -77,7 +77,7 @@ export default function Bookings({ onNavigate }) {
     try {
       const d = await api.bookings();
       setBookings(Array.isArray(d) ? d : (d.data ?? DEMO_BOOKINGS));
-    } catch { setError(true); setBookings(DEMO_BOOKINGS); }
+    } catch { setError(true); }
     finally { setLoading(false); }
   }, []);
 

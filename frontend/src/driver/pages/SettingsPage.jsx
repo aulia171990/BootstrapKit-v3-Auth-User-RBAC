@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Text, Heading, Flex } from '../../design-system/index.js';
-import { ChevronLeft, Bell, Globe, Lock, Moon, LogOut, ChevronRight, Shield } from 'lucide-react';
+import { ChevronLeft, Bell, Globe, Lock, Moon, LogOut, ChevronRight, Shield, Save } from 'lucide-react';
 
 const SETTINGS_GROUPS = [
   {
@@ -29,14 +29,42 @@ const SETTINGS_GROUPS = [
   },
 ];
 
+const STORAGE_KEY = 'driver_settings';
+
 export default function SettingsPage({ onBack, onLogout, onNavigate }) {
   const [settings, setSettings] = React.useState(() => {
     const s = {};
     SETTINGS_GROUPS.forEach((g) => g.items.forEach((item) => { s[item.id] = item.value; }));
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try { Object.assign(s, JSON.parse(saved)); } catch {}
+    }
     return s;
   });
 
-  const toggle = (id) => setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
+  const [hasChanges, setHasChanges] = React.useState(false);
+
+  const toggle = (id) => {
+    setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
+    setHasChanges(true);
+  };
+
+  const updateSetting = (id, value) => {
+    setSettings((prev) => ({ ...prev, [id]: value }));
+    setHasChanges(true);
+  };
+
+  const saveSettings = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    setHasChanges(false);
+  };
+
+  const resetSettings = () => {
+    SETTINGS_GROUPS.forEach((g) => g.items.forEach((item) => {
+      setSettings((prev) => ({ ...prev, [item.id]: item.value }));
+    }));
+    setHasChanges(true);
+  };
 
   return (
     <div className="drv-page">
@@ -65,7 +93,13 @@ export default function SettingsPage({ onBack, onLogout, onNavigate }) {
                     </div>
                   ) : (
                     <Flex gap={4} style={{ alignItems: 'center' }}>
-                      <Text size="sm" color="muted">{settings[item.id]}</Text>
+                      <select
+                        className="drv-select"
+                        value={settings[item.id]}
+                        onChange={(e) => updateSetting(item.id, e.target.value)}
+                      >
+                        {item.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
                       <ChevronRight size={14} color="var(--ds-color-text-muted)" />
                     </Flex>
                   )}
@@ -76,6 +110,12 @@ export default function SettingsPage({ onBack, onLogout, onNavigate }) {
         ))}
 
         <div style={{ marginTop: 24 }}>
+          {hasChanges && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              <button className="drv-btn btn-secondary" onClick={saveSettings}><Save size={14} /> Simpan</button>
+              <button className="drv-btn btn-secondary" onClick={resetSettings}>Reset</button>
+            </div>
+          )}
           <Card style={{ marginBottom: 8, cursor: 'pointer' }}
             onClick={() => onNavigate?.('tab', { id: 'safety' })}>
             <Flex gap={12} style={{ alignItems: 'center' }}>

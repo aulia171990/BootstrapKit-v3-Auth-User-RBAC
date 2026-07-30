@@ -79,9 +79,9 @@ export default function ProfilePage({ user, driver, onLogout, onNavigate }) {
         )}
 
         <Card>
-          {MENU_ITEMS.map((item) =>
+          {MENU_ITEMS.map((item, index) =>
             item.id === 'divider' ? (
-              <div key="div" style={{ height: 1, background: 'var(--ds-color-border)', margin: '8px 0' }} />
+              <div key={`divider-${index}`} style={{ height: 1, background: 'var(--ds-color-border)', margin: '8px 0' }} />
             ) : (
               <button key={item.id} className="drv-menu-row" onClick={() => handleMenu(item.id)}>
                 <Flex gap={12} style={{ alignItems: 'center', width: '100%' }}>

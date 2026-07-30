@@ -19,22 +19,10 @@
 import { api } from '../api.js';
 import { formatIDR } from './booking/pricingEngine.js';
 
-const DEMO = true;
+const DEMO = false;
 
-// Detect whether the real API is reachable. We treat a successful response as
-// "live"; anything else triggers the demo fallback for that call only.
-async function liveOrFallback(fn, fallback) {
-  if (!DEMO) {
-    return fn();
-  }
-  try {
-    return await Promise.race([
-      fn(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('api-timeout')), 2500)),
-    ]);
-  } catch {
-    return fallback();
-  }
+async function liveOrFallback(fn) {
+  return fn();
 }
 
 // ── Identity (real backend) ───────────────────────────────────────────────
@@ -44,18 +32,13 @@ export async function me() {
 
 // ── Wallet balance (real API; never computed on the frontend) ───────────────
 export async function getWallet() {
-  return liveOrFallback(
-    async () => {
-      const b = await api.walletBalance();
-      return {
-        balance: Number(b.available_balance ?? 0),
-        held: Number(b.held_balance ?? 0),
-        currency: b.currency || 'IDR',
-        source: 'api',
-      };
-    },
-    () => ({ balance: 125000, currency: 'IDR', pending: 0, source: 'demo' }),
-  );
+  const b = await api.walletBalance();
+  return {
+    balance: Number(b.available_balance ?? 0),
+    held: Number(b.held_balance ?? 0),
+    currency: b.currency || 'IDR',
+    source: 'api',
+  };
 }
 
 // ── Transactions (real API). Backend returns typed rows (amount is positive;
@@ -87,13 +70,8 @@ function normalizeTx(t) {
 }
 
 export async function getTransactions(limit) {
-  return liveOrFallback(
-    async () => {
-      const list = await api.walletTransactions(limit);
-      return (Array.isArray(list) ? list : []).slice(0, limit).map(normalizeTx);
-    },
-    () => DEMO_TX.slice(0, limit || DEMO_TX.length),
-  );
+  const list = await api.walletTransactions(limit);
+  return (Array.isArray(list) ? list : []).slice(0, limit).map(normalizeTx);
 }
 
 // Paginated history for the Transaction History screen (4B). The real backend

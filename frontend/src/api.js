@@ -68,6 +68,7 @@ export const api = {
   // ── Trip / Booking module (passenger activity) ──
   trips: (params = '') => req('/trips' + (params ? `?${params}` : '')),
   trip: (id) => req('/trips/' + id),
+  bookings: (params = '') => req('/bookings/history' + (params ? `?${params}` : '')),
   bookingsHistory: (params = '') => req('/bookings/history' + (params ? `?${params}` : '')),
   bookingTrack: (id) => req('/bookings/' + id + '/track'),
   orderTrack: (id) => req('/orders/' + id + '/track'),

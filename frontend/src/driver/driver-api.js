@@ -2,16 +2,8 @@ import { api, getToken, setToken, clearToken } from '../api.js';
 
 export { getToken, setToken, clearToken };
 
-const DEMO = true;
-
-async function liveOrFallback(fn, fallback) {
-  if (!DEMO) return fn();
-  try {
-    return await Promise.race([
-      fn(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('api-timeout')), 2500)),
-    ]);
-  } catch { return fallback(); }
+async function liveOrFallback(fn) {
+  return fn();
 }
 
 export const driverAPI = {

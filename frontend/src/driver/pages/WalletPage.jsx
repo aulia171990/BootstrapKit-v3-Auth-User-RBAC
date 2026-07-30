@@ -12,10 +12,8 @@ export default function WalletPage({ onBack, onHistory }) {
   const load = useCallback(async () => {
     setLoading(true); setError(false);
     try {
-      const [bal, txs] = await Promise.all([
-        driverAPI.walletBalance(),
-        driverAPI.walletTransactions(10),
-      ]);
+      const bal = await driverAPI.walletBalance().catch(() => null);
+      const txs = await driverAPI.walletTransactions(10).catch(() => []);
       setBalance(bal?.balance ?? bal?.available_balance ?? bal);
       setTx(Array.isArray(txs) ? txs : []);
     } catch { setError(true); }

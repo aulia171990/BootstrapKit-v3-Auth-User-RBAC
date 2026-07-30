@@ -11,33 +11,6 @@ import {
 import { api } from '../api.js';
 import './admin.css';
 
-const DEMO_STATS = {
-  activeDrivers: 48, onlineDrivers: 32, activeTrips: 12, completedTripsToday: 87,
-  cancelledTrips: 6, revenueToday: 28750000, bookingsToday: 124, avgEta: 4.2,
-  customerSatisfaction: 4.7,
-  tripsInProgress: 12, driversWaiting: 8, pendingDispatch: 3, sosAlerts: 1, incidents: 0,
-  revenueTrend: [120, 145, 138, 170, 190, 210, 240, 225, 260, 275, 260, 287],
-  bookingTrend: [40, 55, 48, 62, 70, 80, 75, 90, 95, 88, 105, 124],
-  activeDriversTrend: [35, 38, 40, 42, 39, 44, 46, 43, 47, 48, 45, 48],
-  activeTripsTrend: [8, 10, 7, 12, 9, 11, 14, 10, 13, 12, 15, 12],
-};
-
-const DEMO_ALERTS = [
-  { id: 'a1', type: 'critical', message: 'SOS from driver AG-1234', time: '2m ago' },
-  { id: 'a2', type: 'warning', message: 'Driver AG-5678 offline for 30 min during trip', time: '5m ago' },
-  { id: 'a3', type: 'info', message: 'Peak hour — 15% surge in Central Jakarta', time: '10m ago' },
-  { id: 'a4', type: 'info', message: '5 new drivers approved today', time: '15m ago' },
-];
-
-const DEMO_ACTIVITIES = [
-  { id: 'act1', user: 'Budi Santoso', action: 'mendaftar sebagai', target: 'Driver', time: '2m ago' },
-  { id: 'act2', user: 'Siti Rahmawati', action: 'menyelesaikan', target: 'Trip #TR-8921', time: '5m ago' },
-  { id: 'act3', user: 'Ahmad Fauzi', action: 'melakukan top-up', target: 'Rp 100.000', time: '7m ago' },
-  { id: 'act4', user: 'Dewi Lestari', action: 'mendaftar sebagai', target: 'Customer', time: '12m ago' },
-  { id: 'act5', user: 'System', action: 'refund', target: 'Trip #TR-8890 — Rp 45.000', time: '15m ago' },
-  { id: 'act6', user: 'Rudi Hermawan', action: 'menyelesaikan', target: 'Trip #TR-8915', time: '20m ago' },
-];
-
 const ALERT_ICONS = {
   critical: AlertTriangle,
   warning: AlertCircle,
@@ -55,7 +28,7 @@ export default function DashboardHome({ onNavigate }) {
     setLoading(true); setError(false);
     try {
       const d = await api.dashboardStats();
-      setStats({ ...DEMO_STATS, ...(d || {}) });
+      setStats(d || {});
     } catch { setError(true); }
     finally { setLoading(false); }
   }, [offline]);
@@ -98,7 +71,7 @@ export default function DashboardHome({ onNavigate }) {
     );
   }
 
-  const s = stats || DEMO_STATS;
+  const s = stats || {};
 
   return (
     <div>
@@ -223,7 +196,7 @@ export default function DashboardHome({ onNavigate }) {
             </div>
             <Card>
               <div className="admin-alert-list">
-                {DEMO_ALERTS.map((a) => {
+                {alerts.map((a) => {
                   const AlertIcon = ALERT_ICONS[a.type] || Info;
                   return (
                     <div key={a.id} className={`admin-alert-item admin-alert-item--${a.type}`}>
